@@ -1,0 +1,32 @@
+{
+  "file": "documentation/api/openapi.yaml",
+  "openapiVersion": "3.1.2",
+  "jsonSchemaDialect": "https://spec.openapis.org/oas/3.1/dialect/base",
+  "pathCount": 39,
+  "operationCount": 48,
+  "schemaCount": 70,
+  "responseComponentCount": 11,
+  "parameterComponentCount": 15,
+  "tagOperationCounts": {
+    "Authentication": 5,
+    "Users": 8,
+    "Cameras": 6,
+    "Incidents": 9,
+    "Evidence": 7,
+    "Chain of Custody": 5,
+    "Reports": 4,
+    "Notifications": 2,
+    "Audit": 2
+  },
+  "checks": {
+    "yamlParsed": true,
+    "uniqueOperationIds": true,
+    "localReferencesResolved": true,
+    "pathParametersDeclared": true,
+    "bearerSecuritySchemeDefined": true,
+    "rbacMetadataPresentOnEveryOperation": true,
+    "auditMetadataPresentOnEveryOperation": true,
+    "sensitiveWritesRequireIdempotencyKey": true
+  },
+  "note": "Validated with structural and reference checks. This is not a substitute for a full external OpenAPI linter in CI."
+}

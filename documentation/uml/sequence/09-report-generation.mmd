@@ -1,0 +1,78 @@
+sequenceDiagram
+    autonumber
+    actor User as Security Manager or Investigator
+    participant Web as Next.js Dashboard
+    participant API as FastAPI Report API
+    participant Authz as Authorization Service
+    participant Report as Reporting Service
+    participant DB as PostgreSQL
+    participant Redact as Redaction Service
+    participant Hash as Hashing Service
+    participant Sign as Signature Service
+    participant Storage as S3 or MinIO
+    participant Audit as Audit Service
+
+    User->>Web: Select report type, date range, and filters
+    Web->>API: POST /api/v1/reports
+    API->>Authz: Check report-generation permission and scope
+
+    alt Report request not authorized
+        Authz-->>API: Access denied
+        API->>Audit: Record denied report request
+        Audit->>DB: Persist audit event
+        API-->>Web: 403 Forbidden
+        Web-->>User: Display authorization error
+    else Report request authorized
+        Authz-->>API: Access granted
+        API->>Report: Validate report parameters
+
+        alt Invalid filters or date range
+            Report-->>API: Validation errors
+            API-->>Web: 422 Validation error
+            Web-->>User: Display report errors
+        else Valid request
+            Report->>DB: Query incidents, cameras, and evidence metadata
+            DB-->>Report: Operational records
+            Report->>DB: Query audit and custody records
+            DB-->>Report: Forensic records
+            Report->>Report: Aggregate statistics and build report model
+            Report->>Redact: Apply role-based masking and redaction
+            Redact-->>Report: Redacted report model
+            Report->>Report: Render report document
+            Report->>Hash: Calculate SHA-256 report hash
+            Hash-->>Report: Report hash
+            Report->>Sign: Digitally sign report hash
+            Sign-->>Report: Report signature
+            Report->>Storage: Store protected report file
+            Storage-->>Report: Storage URI and version
+            Report->>DB: Persist report metadata, hash, and signature
+            DB-->>Report: Report record created
+            Report->>Audit: Record report generation
+            Audit->>DB: Persist audit event
+            Report-->>API: Report identifier and summary
+            API-->>Web: 201 Report generated
+            Web-->>User: Display report summary
+
+            alt View requested
+                User->>Web: Open report
+                Web->>API: GET /api/v1/reports/{id}
+                API->>Report: Load authorized report
+                Report->>Storage: Retrieve report file
+                Storage-->>Report: Protected report
+                Report-->>API: Report stream
+                API-->>Web: 200 Report stream
+                Web-->>User: Display report
+            else Export requested
+                User->>Web: Export PDF or CSV
+                Web->>API: POST /api/v1/reports/{id}/exports
+                API->>Report: Create controlled export
+                Report->>Storage: Store export object
+                Storage-->>Report: Time-limited export reference
+                Report->>Audit: Record report export
+                Audit->>DB: Persist audit event
+                Report-->>API: Secure download reference
+                API-->>Web: 200 Secure export
+                Web-->>User: Deliver time-limited download
+            end
+        end
+    end

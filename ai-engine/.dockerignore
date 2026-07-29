@@ -1,0 +1,47 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Test and coverage output
+tests/
+htmlcov/
+.coverage
+coverage.xml
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
+# Model weights must be mounted at runtime
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.engine
+models/*.torchscript
+
+# Local benchmark artefacts
+benchmark-results.json
+benchmark-results*.json
+
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Build output
+build/
+dist/
+*.egg-info/

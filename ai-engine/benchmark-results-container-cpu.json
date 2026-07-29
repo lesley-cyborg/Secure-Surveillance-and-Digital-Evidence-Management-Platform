@@ -1,0 +1,42 @@
+{
+  "image": "C:\\Users\\Ninja267\\Pictures\\Screenshots\\Screenshot 2026-07-25 221631.png",
+  "runs": 20,
+  "warmup_runs": 3,
+  "confidence_threshold": 0.35,
+  "server_inference_ms": {
+    "minimum": 1590.1438389992109,
+    "mean": 2949.0475859500293,
+    "median": 2897.0057724982325,
+    "p95": 4212.169594000443,
+    "maximum": 4897.549801004061
+  },
+  "end_to_end_ms": {
+    "minimum": 1861.397400003625,
+    "mean": 3585.5588449980132,
+    "median": 3620.160249993205,
+    "p95": 5202.21620000666,
+    "maximum": 5332.675700017717
+  },
+  "detection_counts": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}

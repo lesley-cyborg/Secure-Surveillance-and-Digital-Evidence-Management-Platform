@@ -1,0 +1,91 @@
+sequenceDiagram
+    autonumber
+    actor Officer as Security Officer
+    actor Investigator
+    participant Web as Next.js Dashboard
+    participant API as FastAPI Incident API
+    participant Authz as Authorization Service
+    participant Incident as Incident Service
+    participant Evidence as Evidence Service
+    participant Custody as Chain-of-Custody Service
+    participant DB as PostgreSQL
+    participant Notify as Notification Service
+    participant Audit as Audit Service
+
+    Officer->>Web: Open incident queue
+    Web->>API: GET /api/v1/incidents
+    API->>Authz: Check incident-view permission
+    Authz-->>API: Access decision
+    API->>Incident: List authorized incidents
+    Incident->>DB: Query incidents
+    DB-->>Incident: Incident records
+    Incident-->>API: Incident list
+    API-->>Web: 200 Incident list
+
+    Officer->>Web: Review selected incident
+    Web->>API: GET /api/v1/incidents/{id}
+    API->>Authz: Check incident access
+    Authz-->>API: Access granted
+    API->>Incident: Load incident details
+    Incident->>DB: Query incident, detections, and assignments
+    Incident->>Evidence: Load linked evidence metadata
+    Evidence->>DB: Query evidence metadata
+    DB-->>Evidence: Evidence records
+    Evidence-->>Incident: Linked evidence
+    Incident-->>API: Incident details
+    API-->>Web: 200 Incident details
+
+    alt Officer marks false positive
+        Officer->>Web: Submit false-positive reason
+        Web->>API: PATCH /api/v1/incidents/{id}
+        API->>Authz: Check incident-update permission
+        Authz-->>API: Access granted
+        API->>Incident: Mark false positive
+        Incident->>DB: Update status and reason
+        Incident->>Audit: Record false-positive decision
+        Audit->>DB: Persist audit event
+        API-->>Web: 200 Incident updated
+    else Officer confirms incident
+        Officer->>Web: Confirm and assign investigator
+        Web->>API: POST /api/v1/incidents/{id}/assign
+        API->>Authz: Check assignment permission
+        Authz-->>API: Access granted
+        API->>Incident: Assign investigator
+        Incident->>DB: Persist assignment
+        Incident->>Custody: Record assignment-related custody event
+        Custody->>DB: Persist custody record
+        Incident->>Notify: Notify investigator
+        Notify-->>Investigator: New assignment notification
+        Incident->>Audit: Record confirmation and assignment
+        Audit->>DB: Persist audit event
+
+        loop Investigation updates
+            Investigator->>Web: Add notes, findings, or evidence request
+            Web->>API: PATCH /api/v1/incidents/{id}
+            API->>Authz: Check assigned-case access
+            Authz-->>API: Access granted
+            API->>Incident: Update investigation
+            Incident->>DB: Persist notes and status
+            Incident->>Audit: Record investigation update
+            Audit->>DB: Persist audit event
+            API-->>Web: 200 Incident updated
+        end
+
+        Investigator->>Web: Request incident closure
+        Web->>API: POST /api/v1/incidents/{id}/close
+        API->>Authz: Check closure permission
+
+        alt Closure denied
+            Authz-->>API: Access denied
+            API->>Audit: Record denied closure
+            Audit->>DB: Persist audit event
+            API-->>Web: 403 Forbidden
+        else Closure authorized
+            Authz-->>API: Access granted
+            API->>Incident: Set disposition and closure timestamp
+            Incident->>DB: Persist closed status
+            Incident->>Audit: Record incident closure
+            Audit->>DB: Persist audit event
+            API-->>Web: 200 Incident closed
+        end
+    end

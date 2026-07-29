@@ -1,0 +1,11 @@
+# AI model artefacts
+ai-engine/models/*.pt
+ai-engine/models/*.pth
+ai-engine/models/*.onnx
+ai-engine/models/*.engine
+ai-engine/models/*.torchscript
+
+# Keep the model directory
+!ai-engine/models/.gitkeep
+
+

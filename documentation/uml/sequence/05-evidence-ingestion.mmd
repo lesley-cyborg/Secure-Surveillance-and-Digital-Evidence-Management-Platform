@@ -1,0 +1,75 @@
+sequenceDiagram
+    autonumber
+    actor Source as AI Engine or Authorized User
+    participant API as FastAPI Evidence API
+    participant Authz as Authorization Service
+    participant Evidence as Evidence Service
+    participant Scan as Malware Scanner
+    participant Hash as Hashing Service
+    participant Crypto as Encryption Service
+    participant Key as RSA or KMS Key Service
+    participant Storage as S3 or MinIO
+    participant DB as PostgreSQL
+    participant Custody as Chain-of-Custody Service
+    participant Audit as Audit Service
+
+    Source->>API: POST /api/v1/evidence with file and metadata
+    API->>Authz: Validate source identity and submit permission
+
+    alt Source not authorized
+        Authz-->>API: Access denied
+        API->>Audit: Record denied evidence submission
+        Audit->>DB: Persist audit event
+        API-->>Source: 403 Forbidden
+    else Source authorized
+        Authz-->>API: Access granted
+        API->>Evidence: Validate file, metadata, and incident reference
+
+        alt Evidence package invalid
+            Evidence-->>API: Validation errors
+            API->>Audit: Record invalid evidence submission
+            Audit->>DB: Persist audit event
+            API-->>Source: 422 Validation error
+        else Evidence package valid
+            Evidence->>Scan: Scan file for malware and corruption
+            Scan-->>Evidence: Scan result
+
+            alt File unsafe or corrupted
+                Evidence->>Storage: Quarantine rejected file
+                Evidence->>Audit: Record quarantine event
+                Audit->>DB: Persist audit event
+                Evidence-->>API: File rejected
+                API-->>Source: 422 Unsafe evidence file
+            else File safe
+                Evidence->>Hash: Calculate original SHA-256 hash
+                Hash-->>Evidence: Original hash
+                Evidence->>Crypto: Generate AES-256 data key and encrypt file
+                Crypto->>Key: Wrap AES key with RSA public key or KMS
+                Key-->>Crypto: Wrapped key reference
+                Crypto-->>Evidence: Ciphertext, nonce, tag, and key reference
+                Evidence->>Hash: Build and hash evidence manifest
+                Hash-->>Evidence: Manifest hash
+                Evidence->>Key: Digitally sign evidence manifest
+                Key-->>Evidence: Digital signature
+                Evidence->>Storage: Upload encrypted object
+                Storage-->>Evidence: Object URI, version, and checksum
+
+                alt Storage upload failed
+                    Evidence->>Audit: Record ingestion failure and retry state
+                    Audit->>DB: Persist audit event
+                    Evidence-->>API: Storage failure
+                    API-->>Source: 503 Evidence storage unavailable
+                else Storage upload succeeded
+                    Evidence->>DB: Persist metadata, hashes, signature, and key reference
+                    DB-->>Evidence: Evidence record created
+                    Evidence->>Custody: Create acquisition custody event
+                    Custody->>DB: Persist append-only custody record
+                    Custody-->>Evidence: Custody record ID
+                    Evidence->>Audit: Record successful ingestion
+                    Audit->>DB: Persist audit event
+                    Evidence-->>API: Evidence identifier and status
+                    API-->>Source: 201 Evidence created
+                end
+            end
+        end
+    end

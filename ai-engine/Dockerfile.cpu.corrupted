@@ -1,0 +1,162 @@
+# syntax=docker/dockerfile:1.7
+
+ARG PYTHON_IMAGE=python:3.13.14-slim-bookworm
+
+# -------------------------------------------------------------------
+# Dependency builder
+# -------------------------------------------------------------------
+FROM ${PYTHON_IMAGE} AS builder
+
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
+
+RUN python -m venv "${VIRTUAL_ENV}" \
+    && python -m pip install \
+        --upgrade \
+        pip \
+        setuptools \
+        wheel
+
+WORKDIR /build
+
+COPY pyproject.toml README.md ./
+COPY api ./api
+COPY config ./config
+COPY detection ./detection
+COPY models ./models
+
+# Install CPU-only PyTorch beforPS C:\Users\Ninja267\Desktop\secure-surveillance-platform> docker desktop engine use Linux engine  
+accepts 1 arg(s), received 2
+PS C:\Users\Ninja267\Desktop\secure-surveillance-platform> docker compose `
+>>   --progress plain `
+>>   -f .\docker\compose.ai.cpu.yml `
+>>   build `
+>>   --pull `
+>>   ai-engine
+ Image secure-surveillance-ai-engine:0.2.0-cpu Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 803B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.cpu
+#2 transferring dockerfile:
+#2 transferring dockerfile: 3.04kB 0.2s done
+#2 DONE 0.7s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1.7
+#3 ...
+
+#4 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1.7
+#3 DONE 4.9s
+
+#5 docker-image://docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+#5 resolve docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e 0.1s done
+#5 CACHED
+Dockerfile.cpu:106
+
+--------------------
+
+ 104 |     
+
+ 105 |     CMD [
+
+ 106 | >>>     "python",
+
+ 107 |         "-m",
+
+ 108 |         "uvicorn",
+
+--------------------
+
+failed to solve: dockerfile parse error on line 106: unknown instruction: "python",
+
+
+
+View build details: docker-desktop://dashboard/build/default/default/wr4jwx8hynh5u2gvduhyytpfr
+
+
+What's next:
+    Debug this Compose error with Gordon → docker ai "help me fix this compose error"
+PS C:\Users\Ninja267\Desktop\secure-surveillance-platform>  installing Ultralytics so pip does
+# not pull a CUDA-enabled runtime for this image.
+RUN python -m pip install \
+        --index-url https://download.pytorch.org/whl/cpu \
+        torch==2.12.1 \
+        torchvision==0.27.1 \
+    && python -m pip install ".[model]" \
+    && python -m pip check
+
+# -------------------------------------------------------------------
+# Production runtime
+# -------------------------------------------------------------------
+FROM ${PYTHON_IMAGE} AS runtime
+
+ARG APP_UID=10001
+ARG APP_GID=10001
+
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONHASHSEED=random
+
+# Direct caches and temporary configuration into the writable tmpfs.
+ENV HOME=/tmp/home
+ENV XDG_CACHE_HOME=/tmp/cache
+ENV TORCH_HOME=/tmp/torch
+ENV YOLO_CONFIG_DIR=/tmp/ultralytics
+ENV MPLCONFIGDIR=/tmp/matplotlib
+
+RUN apt-get update \
+    && apt-get install \
+        --yes \
+        --no-install-recommends \
+        libgl1 \
+        libglib2.0-0 \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd \
+        --gid "${APP_GID}" \
+        ai-engine \
+    && useradd \
+        --uid "${APP_UID}" \
+        --gid "${APP_GID}" \
+        --create-home \
+        --shell /usr/sbin/nologin \
+        ai-engine \
+    && mkdir -p \
+        /app \
+        /model-store \
+    && chown \
+        "${APP_UID}:${APP_GID}" \
+        /app \
+    && chmod 0755 /model-store
+
+COPY --from=builder \
+    --chown=${APP_UID}:${APP_GID} \
+    /opt/venv \
+    /opt/venv
+
+WORKDIR /app
+
+USER ${APP_UID}:${APP_GID}
+
+EXPOSE 8001
+
+HEALTHCHECK \
+    --interval=30s \
+    --timeout=5s \
+    --start-period=120s \
+    --retries=3 \
+    CMD ["python", "-c", "import urllib.request; response = urllib.request.urlopen('http://127.0.0.1:8001/health/ready', timeout=4); raise SystemExit(0 if response.status == 200 else 1)"]
+
+ENTRYPOINT ["python", "-m", "uvicorn"]
+
+CMD ["api.main:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1", "--limit-concurrency", "16", "--timeout-keep-alive", "5", "--timeout-graceful-shutdown", "45", "--no-server-header"]

@@ -1,0 +1,400 @@
+﻿secure-surveillance-ai-engine  | 2026-07-27T14:20:52.656063548Z [W727 14:20:52.228771411 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.657898625Z [W727 14:20:52.230595321 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.672476421Z [W727 14:20:52.245100166 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.716578633Z [W727 14:20:52.289350029 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.759925666Z [W727 14:20:52.332468315 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.786838766Z [W727 14:20:52.359503576 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.788751926Z [W727 14:20:52.361403916 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.803513203Z [W727 14:20:52.376106783 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.807216277Z [W727 14:20:52.379740313 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.869672316Z [W727 14:20:52.441520037 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.889153734Z [W727 14:20:52.461811525 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.893924901Z [W727 14:20:52.466568335 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.919372503Z [W727 14:20:52.476901633 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.919423650Z [W727 14:20:52.485489991 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.958894271Z [W727 14:20:52.531564512 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:52.992249077Z [W727 14:20:52.564839673 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.016077177Z [W727 14:20:53.588496395 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.034212030Z [W727 14:20:53.606859772 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.038259890Z [W727 14:20:53.610964548 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.043064242Z [W727 14:20:53.615713943 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.058050486Z [W727 14:20:53.630712994 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.059447871Z [W727 14:20:53.632241316 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.097369456Z 2026-07-27 14:20:53 [info     ] inference_completed            confidence_threshold=0.35 correlation_id=33720616-0a91-49b0-ae83-7cbcd4a7e563 detection_count=1 frame_height=481 frame_width=486 inference_device=cpu inference_duration_ms=1876.81 model_name=surveillance-yolo model_version=yolo26n-coco requested_model_name=None requested_model_version=None
+secure-surveillance-ai-engine  | 2026-07-27T14:20:53.097990501Z INFO:     172.19.0.1:53066 - "POST /api/v1/detect/image HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:20:54.040102081Z [W727 14:20:54.608607287 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:54.195354088Z [W727 14:20:54.764679032 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:54.456284328Z [W727 14:20:54.029079264 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:54.536130961Z [W727 14:20:54.108965990 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:54.826110773Z [W727 14:20:54.386139344 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:54.826320904Z [W727 14:20:54.394269897 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:54.971634598Z [W727 14:20:54.539479353 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.011493141Z [W727 14:20:54.577320654 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.011541967Z [W727 14:20:55.580656339 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.195395980Z [W727 14:20:55.760474533 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.195476665Z [W727 14:20:55.767291766 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.243811833Z [W727 14:20:55.816663953 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.245644139Z [W727 14:20:55.818497309 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.259094024Z [W727 14:20:55.831912602 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.278574503Z [W727 14:20:55.851391137 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.328630313Z [W727 14:20:55.901478038 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.783459501Z [W727 14:20:55.350789532 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.790900358Z [W727 14:20:55.358112452 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.837819414Z [W727 14:20:55.392468961 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.837869148Z [W727 14:20:55.404799244 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.852527953Z [W727 14:20:55.408782270 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.852603766Z [W727 14:20:55.422530026 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.870784845Z [W727 14:20:55.443622754 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.918965599Z [W727 14:20:55.491712030 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.988520178Z [W727 14:20:55.558024532 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.988568763Z [W727 14:20:55.559887095 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:55.990305514Z [W727 14:20:55.563133617 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.040983680Z [W727 14:20:56.613663841 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.199449125Z [W727 14:20:56.741447255 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.247255691Z [W727 14:20:56.793142902 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.247301293Z [W727 14:20:56.806393427 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.248332784Z [W727 14:20:56.821151258 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.314697202Z [W727 14:20:56.887343766 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.345995789Z [W727 14:20:56.918767431 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.865837278Z [W727 14:20:56.433880893 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.865890763Z [W727 14:20:56.435428899 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.883128488Z [W727 14:20:56.438665743 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:56.974822836Z [W727 14:20:56.539098213 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.069553192Z [W727 14:20:57.633195536 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.149619203Z [W727 14:20:57.698117724 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.149691877Z [W727 14:20:57.699801299 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.157940072Z [W727 14:20:57.727179629 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.157984604Z [W727 14:20:57.730556753 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.277543462Z [W727 14:20:57.831913304 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.288987065Z [W727 14:20:57.861692398 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.303012445Z [W727 14:20:57.871672482 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.311447064Z [W727 14:20:57.878301905 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.323013146Z [W727 14:20:57.895430352 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.460081031Z [W727 14:20:57.985354044 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.460134336Z [W727 14:20:57.020459399 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.527614570Z [W727 14:20:57.082394366 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.527689152Z [W727 14:20:57.091191002 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.540033954Z [W727 14:20:57.112852893 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.546843355Z [W727 14:20:57.119668720 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.570225090Z [W727 14:20:57.135553946 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.591338309Z [W727 14:20:57.146268351 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.644284983Z 2026-07-27 14:20:57 [info     ] inference_completed            confidence_threshold=0.35 correlation_id=f543f7e9-c1ec-4cb9-a971-d8b9e438a856 detection_count=1 frame_height=481 frame_width=486 inference_device=cpu inference_duration_ms=3821.929 model_name=surveillance-yolo model_version=yolo26n-coco requested_model_name=None requested_model_version=None
+secure-surveillance-ai-engine  | 2026-07-27T14:20:57.644442269Z INFO:     172.19.0.1:53066 - "POST /api/v1/detect/image HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:20:58.699366394Z [W727 14:20:58.268008536 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:58.828524708Z [W727 14:20:58.401271996 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:59.323257562Z [W727 14:20:59.826127035 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:20:59.912714478Z [W727 14:20:59.968568044 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.309558747Z [W727 14:21:00.677109673 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.309726621Z [W727 14:21:00.686217190 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.309736447Z [W727 14:21:00.773911886 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.309740389Z [W727 14:21:00.775832370 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.309744011Z [W727 14:21:00.790681971 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.441396445Z [W727 14:21:00.014191559 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.473627571Z [W727 14:21:00.039344520 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.708493540Z [W727 14:21:00.182308415 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.708544389Z [W727 14:21:00.183654358 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.708548937Z [W727 14:21:00.191470241 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.741558231Z [W727 14:21:00.266719095 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.806188372Z [W727 14:21:00.357792794 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.880291085Z [W727 14:21:00.443203471 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.883635951Z [W727 14:21:00.456295462 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.963110699Z [W727 14:21:00.533041204 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:00.990559768Z [W727 14:21:00.537044471 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.013535654Z [W727 14:21:00.551180520 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.013584911Z [W727 14:21:00.559740362 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.076521619Z [W727 14:21:01.634291832 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.145371320Z [W727 14:21:01.715645116 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.233171763Z [W727 14:21:01.779905775 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.247437123Z [W727 14:21:01.807735145 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.247486255Z [W727 14:21:01.811127606 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.354787670Z [W727 14:21:01.888270285 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.433015335Z [W727 14:21:01.996429924 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.673552926Z [W727 14:21:01.155660479 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.673605554Z [W727 14:21:01.158451292 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.673610488Z [W727 14:21:01.173516046 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.875598027Z [W727 14:21:01.380095191 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.875643702Z [W727 14:21:01.399506763 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.981009333Z [W727 14:21:01.454612535 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.981056769Z [W727 14:21:01.456483045 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:01.981061483Z [W727 14:21:01.484411064 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.057442241Z [W727 14:21:01.566007542 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.107830739Z [W727 14:21:02.635987284 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339299288Z [W727 14:21:02.704896222 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339348870Z [W727 14:21:02.706726694 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339353488Z [W727 14:21:02.710834887 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339357101Z [W727 14:21:02.724384107 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339360422Z [W727 14:21:02.791843547 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339363594Z [W727 14:21:02.811534105 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339366790Z [W727 14:21:02.879623521 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.339370082Z [W727 14:21:02.880595570 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.403987398Z [W727 14:21:02.909539734 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.446260453Z [W727 14:21:02.991544768 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.493289646Z [W727 14:21:02.047397902 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.515271148Z [W727 14:21:02.086045016 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.575329458Z [W727 14:21:02.127148649 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.599306674Z [W727 14:21:02.147230124 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.599352466Z [W727 14:21:02.162972339 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.599357466Z [W727 14:21:02.166663908 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.623791968Z [W727 14:21:02.179813471 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.715203481Z 2026-07-27 14:21:02 [info     ] inference_completed            confidence_threshold=0.35 correlation_id=17a27bfc-77b1-450f-8bab-4092322e583f detection_count=1 frame_height=481 frame_width=486 inference_device=cpu inference_duration_ms=4212.17 model_name=surveillance-yolo model_version=yolo26n-coco requested_model_name=None requested_model_version=None
+secure-surveillance-ai-engine  | 2026-07-27T14:21:02.715248886Z INFO:     172.19.0.1:53066 - "POST /api/v1/detect/image HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:21:03.459581590Z [W727 14:21:03.017155083 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:03.885736858Z [W727 14:21:03.190728419 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.097221153Z [W727 14:21:04.654682355 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.262584059Z [W727 14:21:04.755935492 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.429886287Z [W727 14:21:04.002001780 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.455099846Z [W727 14:21:04.023001797 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.531303154Z [W727 14:21:04.089497214 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.531375563Z [W727 14:21:04.095800585 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.531381727Z [W727 14:21:04.099025494 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.635668718Z [W727 14:21:04.206913404 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.661945139Z [W727 14:21:04.226387808 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.690132533Z [W727 14:21:04.262806136 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.707229565Z [W727 14:21:04.264290573 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.707281067Z [W727 14:21:04.266783736 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.717199256Z [W727 14:21:04.288993664 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.762392260Z [W727 14:21:04.327393874 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.809519369Z [W727 14:21:04.365905409 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.840552412Z [W727 14:21:04.398616261 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.915420094Z [W727 14:21:04.481641150 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.931330392Z [W727 14:21:04.483590890 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.931405017Z [W727 14:21:04.498314266 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.960468791Z [W727 14:21:04.528683004 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:04.995133639Z [W727 14:21:04.557237798 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.074096595Z [W727 14:21:05.630012538 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.097313297Z [W727 14:21:05.669896064 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.111029149Z [W727 14:21:05.683877281 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.117916464Z [W727 14:21:05.687532040 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.146858956Z [W727 14:21:05.719497970 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.192403280Z [W727 14:21:05.765115254 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.233884356Z [W727 14:21:05.806542001 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.245656992Z [W727 14:21:05.818340994 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.250592092Z [W727 14:21:05.823181957 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.305241654Z [W727 14:21:05.877785839 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.325715502Z [W727 14:21:05.898470325 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.359428471Z [W727 14:21:05.932168169 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.361163853Z [W727 14:21:05.933956522 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.366110000Z [W727 14:21:05.937167496 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.403768805Z [W727 14:21:05.976387319 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.453689865Z [W727 14:21:05.026287906 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.476117865Z [W727 14:21:05.048812435 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.477767156Z [W727 14:21:05.050523886 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.486863067Z [W727 14:21:05.059486184 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.493197267Z [W727 14:21:05.065789897 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.551276174Z [W727 14:21:05.123944267 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.568527633Z [W727 14:21:05.141074362 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.575104386Z [W727 14:21:05.147760888 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.575584781Z [W727 14:21:05.148511974 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.602360653Z [W727 14:21:05.165010438 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.633924685Z [W727 14:21:05.206659659 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.677986142Z [W727 14:21:05.250661343 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.711075493Z [W727 14:21:05.283731419 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.728780737Z [W727 14:21:05.301384736 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.742513281Z [W727 14:21:05.315210907 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.746963547Z [W727 14:21:05.319603054 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.750921530Z [W727 14:21:05.322921656 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:05.751695013Z [W727 14:21:05.324279391 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:06.056712254Z 2026-07-27 14:21:06 [info     ] inference_completed            confidence_threshold=0.35 correlation_id=86920b45-8d59-4270-bd7c-7ac27895e77c detection_count=1 frame_height=481 frame_width=486 inference_device=cpu inference_duration_ms=2856.078 model_name=surveillance-yolo model_version=yolo26n-coco requested_model_name=None requested_model_version=None
+secure-surveillance-ai-engine  | 2026-07-27T14:21:06.056759809Z INFO:     172.19.0.1:53066 - "POST /api/v1/detect/image HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:21:06.633555817Z [W727 14:21:06.152651576 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:06.713983081Z [W727 14:21:06.265751148 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:06.886596385Z [W727 14:21:06.459433149 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:06.922227314Z [W727 14:21:06.494981212 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.019268763Z [W727 14:21:07.592120024 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.028213031Z [W727 14:21:07.601035080 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.047882841Z [W727 14:21:07.620745767 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.049661647Z [W727 14:21:07.622612287 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.052880031Z [W727 14:21:07.625678031 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.092058901Z [W727 14:21:07.664878248 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.105418201Z [W727 14:21:07.678224938 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.122926301Z [W727 14:21:07.695748401 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.124780469Z [W727 14:21:07.697663502 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.127409292Z [W727 14:21:07.700274415 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.139297206Z [W727 14:21:07.712178716 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.162001546Z [W727 14:21:07.734821778 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.175043924Z [W727 14:21:07.747859055 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.181800378Z [W727 14:21:07.754658450 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.202260596Z [W727 14:21:07.775117120 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.204315569Z [W727 14:21:07.777213982 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.208463672Z [W727 14:21:07.781334895 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.211990703Z [W727 14:21:07.784842624 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.225219213Z [W727 14:21:07.798048701 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.245132813Z [W727 14:21:07.817965713 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.266516730Z [W727 14:21:07.839273965 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.272595788Z [W727 14:21:07.845412477 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.279507950Z [W727 14:21:07.852362553 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.300018079Z [W727 14:21:07.872890283 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.349036285Z [W727 14:21:07.921784893 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.389504595Z [W727 14:21:07.962312505 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.393643794Z [W727 14:21:07.966416391 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.400489788Z [W727 14:21:07.973213610 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.464638388Z [W727 14:21:07.037241266 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.485230719Z [W727 14:21:07.047359884 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.359314095Z [W727 14:21:07.087687723 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.397390074Z [W727 14:21:07.113702459 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.397472459Z [W727 14:21:07.117115236 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.433038293Z [W727 14:21:07.161396201 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.477172542Z [W727 14:21:07.203763327 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.510541657Z [W727 14:21:07.238959653 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.512451131Z [W727 14:21:07.240886583 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.526774625Z [W727 14:21:07.255177303 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.531015912Z [W727 14:21:07.259192634 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.610315468Z [W727 14:21:07.332836845 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.613298727Z [W727 14:21:07.341808940 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.627879137Z [W727 14:21:07.356383528 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.628746575Z [W727 14:21:07.357365553 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.646220926Z [W727 14:21:07.374684026 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.687060257Z [W727 14:21:07.406878510 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.703313584Z [W727 14:21:07.431615431 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.722980325Z [W727 14:21:07.451295138 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.739192986Z [W727 14:21:07.467488836 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.742725352Z [W727 14:21:07.471070875 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.756607020Z [W727 14:21:07.484951764 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.759735692Z [W727 14:21:07.487998093 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.761576103Z [W727 14:21:07.490037176 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.793164891Z 2026-07-27 14:21:07 [info     ] inference_completed            confidence_threshold=0.35 correlation_id=5fe0a9e7-daec-44ac-8b4b-20fde040a396 detection_count=1 frame_height=481 frame_width=486 inference_device=cpu inference_duration_ms=1650.988 model_name=surveillance-yolo model_version=yolo26n-coco requested_model_name=None requested_model_version=None
+secure-surveillance-ai-engine  | 2026-07-27T14:21:07.795630055Z INFO:     172.19.0.1:53066 - "POST /api/v1/detect/image HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:21:24.222003189Z INFO:     127.0.0.1:38780 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:21:59.251716441Z INFO:     127.0.0.1:47366 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:23:23.951471980Z INFO:     127.0.0.1:34382 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:26:24.032495029Z INFO:     Shutting down
+secure-surveillance-ai-engine  | 2026-07-27T14:26:26.788537566Z INFO:     Waiting for application shutdown.
+secure-surveillance-ai-engine  | 2026-07-27T14:46:15.505390697Z INFO:     Started server process [7]
+secure-surveillance-ai-engine  | 2026-07-27T14:46:15.767954414Z INFO:     Waiting for application startup.
+secure-surveillance-ai-engine  | 2026-07-27T14:48:18.583277246Z Creating new Ultralytics Settings v0.0.6 file Γ£à 
+secure-surveillance-ai-engine  | 2026-07-27T14:48:18.599414252Z View Ultralytics Settings with 'yolo settings' or at '/tmp/Ultralytics/settings.json'
+secure-surveillance-ai-engine  | 2026-07-27T14:48:18.599459490Z Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=path/to/dir'. For help see https://docs.ultralytics.com/quickstart/#ultralytics-settings.
+secure-surveillance-ai-engine  | 2026-07-27T14:48:35.636712064Z 2026-07-27 14:48:35 [info     ] production_model_loaded        device=cpu labels=('person', 'bicycle', 'car', 'motorcycle', 'bus', 'truck') model_name=surveillance-yolo model_path=/model-store/yolo26n.pt model_version=yolo26n-coco
+secure-surveillance-ai-engine  | 2026-07-27T14:49:12.489786742Z [W727 14:49:12.372707157 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:28.659965546Z [W727 14:49:28.868854281 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:29.833905124Z [W727 14:49:29.047507610 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:30.053948367Z [W727 14:49:30.267175549 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:31.650805542Z [W727 14:49:31.838327354 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337501355Z [W727 14:49:32.353927473 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337657770Z [W727 14:49:33.682327401 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337674366Z [W727 14:49:33.695714880 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337679071Z [W727 14:49:33.707995599 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337683321Z [W727 14:49:33.133509566 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337687377Z [W727 14:49:33.176471572 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337691375Z [W727 14:49:34.323737598 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337695290Z [W727 14:49:34.326281668 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337699239Z [W727 14:49:34.350658484 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.337703339Z [W727 14:49:34.447914789 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.602300210Z [W727 14:49:34.810847102 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.716089624Z [W727 14:49:34.929109409 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:34.947453146Z [W727 14:49:34.154123447 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:35.591624880Z [W727 14:49:35.786010033 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.306877772Z [W727 14:49:35.814544565 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.306979741Z [W727 14:49:35.834491482 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.306988322Z [W727 14:49:36.469307857 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.658239170Z [W727 14:49:36.868545799 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.696935050Z [W727 14:49:36.906067716 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.768785964Z [W727 14:49:36.973192163 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.782122733Z [W727 14:49:36.989458723 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:36.791604411Z [W727 14:49:36.002323467 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:37.059355537Z [W727 14:49:37.273109849 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:37.126422511Z [W727 14:49:37.340122692 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:37.222504916Z [W727 14:49:37.436071337 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:37.226162673Z [W727 14:49:37.439852782 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:37.739982468Z [W727 14:49:37.946551898 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:38.502001105Z [W727 14:49:38.647926935 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:38.965308904Z [W727 14:49:38.714636969 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.311540772Z [W727 14:49:39.485154271 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.311590774Z [W727 14:49:39.491590476 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.311596111Z [W727 14:49:39.508225255 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.447631858Z [W727 14:49:39.661706666 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.575977460Z [W727 14:49:39.790011739 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.618243005Z [W727 14:49:39.832244604 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.629712006Z [W727 14:49:39.843695981 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.665612482Z [W727 14:49:39.859268575 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.666268011Z [W727 14:49:39.877691047 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.797836509Z [W727 14:49:39.010564092 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.859420412Z [W727 14:49:39.073448516 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.884000432Z [W727 14:49:39.095042588 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.904632024Z [W727 14:49:39.109074839 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.919378940Z [W727 14:49:39.133397407 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:39.992706913Z [W727 14:49:39.197650443 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:40.020316373Z [W727 14:49:40.233237503 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:40.064375612Z [W727 14:49:40.278298091 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:40.124207006Z [W727 14:49:40.315573680 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:40.124327450Z [W727 14:49:40.331542029 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:40.156193735Z [W727 14:49:40.365586077 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:40.218625059Z [W727 14:49:40.412676520 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:40.218680025Z [W727 14:49:40.428175264 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:42.767661357Z 2026-07-27 14:49:42 [info     ] production_model_warmed        image_size=640 model_name=surveillance-yolo model_version=yolo26n-coco
+secure-surveillance-ai-engine  | 2026-07-27T14:49:42.965935711Z 2026-07-27 14:49:42 [info     ] production_model_ready         device=cpu model_name=surveillance-yolo model_version=yolo26n-coco warmup_runs=1
+secure-surveillance-ai-engine  | 2026-07-27T14:49:43.157995561Z INFO:     Application startup complete.
+secure-surveillance-ai-engine  | 2026-07-27T14:49:43.445970024Z INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+secure-surveillance-ai-engine  | 2026-07-27T14:49:50.831663573Z INFO:     172.19.0.1:45034 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:50:11.324262004Z INFO:     127.0.0.1:46584 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:50:43.323183826Z INFO:     127.0.0.1:36660 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:51:20.372210027Z INFO:     127.0.0.1:38534 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:51:51.353683170Z INFO:     127.0.0.1:54860 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:52:24.285281993Z INFO:     127.0.0.1:42892 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:52:54.979159462Z INFO:     127.0.0.1:60936 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:55:02.275234016Z [W727 14:55:02.879292378 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:05.610817608Z [W727 14:55:05.232627256 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.324066228Z [W727 14:55:10.533996525 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.324542441Z [W727 14:55:12.541771713 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.324577313Z [W727 14:55:13.894959857 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.428670134Z [W727 14:55:13.948523799 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.455111106Z [W727 14:55:13.075148641 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.538621527Z [W727 14:55:13.107958143 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.538681813Z [W727 14:55:13.125443257 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.800075694Z [W727 14:55:13.407958258 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.820775137Z [W727 14:55:13.433525121 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.909416106Z [W727 14:55:13.531809181 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.936470057Z [W727 14:55:13.548473548 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:13.955876295Z [W727 14:55:13.575388207 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:14.004529666Z [W727 14:55:13.617074270 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:14.077256505Z [W727 14:55:14.676780585 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:14.119452849Z [W727 14:55:14.733263333 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:14.168043976Z [W727 14:55:14.787606025 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:15.787507823Z [W727 14:55:15.210882124 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:15.787560466Z [W727 14:55:15.277848158 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:15.787565659Z [W727 14:55:15.359576946 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:15.843032902Z [W727 14:55:15.443803987 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:15.966076584Z [W727 14:55:15.580608497 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.043528294Z [W727 14:55:16.633320500 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.069520399Z [W727 14:55:16.691382864 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.073466947Z [W727 14:55:16.693839941 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.108982181Z [W727 14:55:16.708103735 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.165711891Z [W727 14:55:16.778079369 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.243628040Z [W727 14:55:16.865780391 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.309832024Z [W727 14:55:16.930139945 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.321489721Z [W727 14:55:16.943718535 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.336229853Z [W727 14:55:16.958698136 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.476613829Z [W727 14:55:16.094750681 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.535766918Z [W727 14:55:16.122408038 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.557646371Z [W727 14:55:16.175294647 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.557697040Z [W727 14:55:16.179418009 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.575448218Z [W727 14:55:16.196926133 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.676590922Z [W727 14:55:16.299042217 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.834042049Z [W727 14:55:16.431022080 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.884907080Z [W727 14:55:16.492813638 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.884959393Z [W727 14:55:16.499556815 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.889156529Z [W727 14:55:16.511356757 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:16.904977626Z [W727 14:55:16.527389352 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.015167218Z [W727 14:55:17.637319173 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.068171641Z [W727 14:55:17.681201990 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.090699778Z [W727 14:55:17.710526376 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.091226695Z [W727 14:55:17.713549297 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.134920302Z [W727 14:55:17.747532658 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.184038638Z [W727 14:55:17.805196983 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.225480455Z [W727 14:55:17.841915601 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.251515644Z [W727 14:55:17.873811621 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.285157999Z [W727 14:55:17.894655441 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.288793054Z [W727 14:55:17.911178558 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.325972908Z [W727 14:55:17.930685440 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.331673009Z [W727 14:55:17.953943156 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:17.337892298Z [W727 14:55:17.960120317 NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+secure-surveillance-ai-engine  | 2026-07-27T14:55:18.296563401Z INFO:     127.0.0.1:42938 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:55:18.433588981Z 2026-07-27 14:55:18 [info     ] inference_completed            confidence_threshold=0.35 correlation_id=4d868168-ca3f-4601-ae8c-e426c8091038 detection_count=1 frame_height=481 frame_width=486 inference_device=cpu inference_duration_ms=30896.686 model_name=surveillance-yolo model_version=yolo26n-coco requested_model_name=None requested_model_version=None
+secure-surveillance-ai-engine  | 2026-07-27T14:55:18.470603178Z INFO:     172.19.0.1:43312 - "POST /api/v1/detect/image HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:55:55.097207126Z INFO:     127.0.0.1:48336 - "GET /health/ready HTTP/1.1" 200 OK
+secure-surveillance-ai-engine  | 2026-07-27T14:56:59.378987413Z INFO:     Shutting down
+secure-surveillance-ai-engine  | 2026-07-27T14:57:00.193300860Z INFO:     Waiting for application shutdown.
+secure-surveillance-ai-engine  | 2026-07-27T14:57:55.108113649Z 2026-07-27 14:57:55 [info     ] production_model_unloaded      model_name=surveillance-yolo model_version=yolo26n-coco
+secure-surveillance-ai-engine  | 2026-07-27T14:57:55.174186626Z 2026-07-27 14:57:55 [info     ] production_model_stopped       model_name=surveillance-yolo model_version=yolo26n-coco
+secure-surveillance-ai-engine  | 2026-07-27T14:57:55.174545920Z INFO:     Application shutdown complete.
+secure-surveillance-ai-engine  | 2026-07-27T14:57:55.174599675Z INFO:     Finished server process [7]

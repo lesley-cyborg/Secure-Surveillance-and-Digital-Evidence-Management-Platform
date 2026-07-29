@@ -1,0 +1,62 @@
+name: secure-surveillance-platform
+
+services:
+  ai-engine:
+    container_name: secure-surveillance-ai-engine
+    image: secure-surveillance-ai-engine:0.2.0-cpu
+
+    build:
+      context: ../ai-engine
+      dockerfile: Dockerfile.cpu
+      args:
+        PYTHON_IMAGE: python:3.13-slim-bookworm
+        APP_UID: "10001"
+        APP_GID: "10001"
+
+    env_file:
+      - ../ai-engine/.env
+
+    environment:
+      AI_PRODUCTION_MODEL_ENABLED: "true"
+      AI_MODEL_PATH: /model-store/yolo26n.pt
+      AI_MODEL_DEVICE: cpu
+
+      AI_MAXIMUM_CONCURRENT_INFERENCES: "1"
+      AI_INFERENCE_QUEUE_TIMEOUT_SECONDS: "2.0"
+
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+
+      HOME: /tmp/home
+      XDG_CACHE_HOME: /tmp/cache
+      TORCH_HOME: /tmp/torch
+      YOLO_CONFIG_DIR: /tmp
+      MPLCONFIGDIR: /tmp/matplotlib
+
+    volumes:
+      - type: bind
+        source: ../ai-engine/models/yolo26n.pt
+        target: /model-store/yolo26n.pt
+        read_only: true
+
+    ports:
+      - "8001:8001"
+
+    restart: unless-stopped
+    init: true
+
+    stop_signal: SIGTERM
+    stop_grace_period: 90s
+
+    read_only: true
+
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    pids_limit: 256

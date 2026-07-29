@@ -1,0 +1,77 @@
+sequenceDiagram
+    autonumber
+    actor Investigator
+    participant Web as Next.js Dashboard
+    participant API as FastAPI Evidence API
+    participant Authz as Authorization Service
+    participant Evidence as Evidence Service
+    participant DB as PostgreSQL
+    participant Custody as Chain-of-Custody Service
+    participant Storage as S3 or MinIO
+    participant Key as RSA or KMS Key Service
+    participant Crypto as Decryption Service
+    participant Hash as Integrity Service
+    participant Audit as Audit Service
+
+    Investigator->>Web: Search for evidence
+    Web->>API: GET /api/v1/evidence?filters
+    API->>Authz: Check evidence-list permission and case scope
+    Authz-->>API: Access decision
+
+    alt Access denied
+        API->>Audit: Record denied evidence search
+        Audit->>DB: Persist audit event
+        API-->>Web: 403 Forbidden
+        Web-->>Investigator: Display access error
+    else Access granted
+        API->>Evidence: Search authorized evidence
+        Evidence->>DB: Query evidence metadata
+        DB-->>Evidence: Matching evidence records
+        Evidence-->>API: Evidence summaries
+        API-->>Web: 200 Evidence results
+        Web-->>Investigator: Display evidence list
+
+        Investigator->>Web: Select evidence and action
+        Web->>API: GET /api/v1/evidence/{id}
+        API->>Authz: Check item access and requested action
+        Authz-->>API: Access granted
+        API->>Evidence: Retrieve evidence
+        Evidence->>DB: Load metadata, hash, storage URI, and key reference
+        DB-->>Evidence: Evidence metadata
+        Evidence->>Custody: Create access-attempt custody record
+        Custody->>DB: Persist custody event
+        Evidence->>Storage: Retrieve encrypted object
+        Storage-->>Evidence: Ciphertext object
+        Evidence->>Key: Unwrap AES key
+        Key-->>Evidence: Authorized data key
+        Evidence->>Crypto: Decrypt in controlled workspace
+        Crypto-->>Evidence: Decrypted stream
+        Evidence->>Hash: Calculate current SHA-256 hash
+        Hash-->>Evidence: Current hash
+
+        alt Integrity check failed
+            Evidence->>Audit: Record integrity failure
+            Audit->>DB: Persist audit event
+            Evidence->>Custody: Record failed verification
+            Custody->>DB: Persist custody event
+            Evidence-->>API: Delivery blocked
+            API-->>Web: 409 Evidence integrity failure
+            Web-->>Investigator: Display integrity alert
+        else Integrity check passed
+            alt Protected view requested
+                Evidence-->>API: Protected evidence stream
+                API-->>Web: 200 Stream response
+                Web-->>Investigator: Display protected viewer
+                Evidence->>Audit: Record completed view
+            else Download requested
+                Evidence->>Evidence: Create controlled export and watermark
+                Evidence-->>API: Time-limited download reference
+                API-->>Web: 200 Secure download
+                Web-->>Investigator: Deliver controlled export
+                Evidence->>Custody: Record export event
+                Custody->>DB: Persist custody event
+                Evidence->>Audit: Record completed export
+            end
+            Audit->>DB: Persist audit event
+        end
+    end

@@ -1,0 +1,106 @@
+# syntax=docker/dockerfile:1.7
+
+ARG PYTHON_IMAGE=python:3.13-slim-bookworm
+
+# ------------------------------------------------------------
+# Dependency builder
+# ------------------------------------------------------------
+FROM ${PYTHON_IMAGE} AS builder
+
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
+
+RUN python -m venv "${VIRTUAL_ENV}" \
+    && python -m pip install \
+        --upgrade \
+        pip \
+        setuptools \
+        wheel
+
+WORKDIR /build
+
+COPY pyproject.toml README.md ./
+COPY api ./api
+COPY config ./config
+COPY detection ./detection
+COPY models ./models
+COPY streaming ./streaming
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    PIP_NO_CACHE_DIR=0 \
+    python -m pip install \
+        --index-url https://download.pytorch.org/whl/cpu \
+        torch \
+        torchvision
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    PIP_NO_CACHE_DIR=0 \
+    python -m pip install ".[model]" \
+    && python -m pip check
+
+# ------------------------------------------------------------
+# Production runtime
+# ------------------------------------------------------------
+FROM ${PYTHON_IMAGE} AS runtime
+
+ARG APP_UID=10001
+ARG APP_GID=10001
+
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONHASHSEED=random
+
+ENV HOME=/tmp/home
+ENV XDG_CACHE_HOME=/tmp/cache
+ENV TORCH_HOME=/tmp/torch
+ENV YOLO_CONFIG_DIR=/tmp
+ENV MPLCONFIGDIR=/tmp/matplotlib
+
+RUN apt-get update \
+    && apt-get install \
+        --yes \
+        --no-install-recommends \
+        libgl1 \
+        libglib2.0-0 \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd \
+        --gid "${APP_GID}" \
+        ai-engine \
+    && useradd \
+        --uid "${APP_UID}" \
+        --gid "${APP_GID}" \
+        --no-create-home \
+        --shell /usr/sbin/nologin \
+        ai-engine \
+    && mkdir -p /app /model-store \
+    && chown "${APP_UID}:${APP_GID}" /app \
+    && chmod 0755 /model-store
+
+COPY --from=builder \
+    --chown=${APP_UID}:${APP_GID} \
+    /opt/venv \
+    /opt/venv
+
+WORKDIR /app
+
+USER ${APP_UID}:${APP_GID}
+
+EXPOSE 8001
+
+HEALTHCHECK \
+    --interval=30s \
+    --timeout=5s \
+    --start-period=120s \
+    --retries=3 \
+    CMD ["python", "-c", "import urllib.request; response = urllib.request.urlopen('http://127.0.0.1:8001/health/ready', timeout=4); raise SystemExit(0 if response.status == 200 else 1)"]
+
+ENTRYPOINT ["python", "-m", "uvicorn"]
+
+CMD ["api.main:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1", "--limit-concurrency", "16", "--timeout-keep-alive", "5", "--timeout-graceful-shutdown", "60", "--no-server-header"]

@@ -1,0 +1,78 @@
+sequenceDiagram
+    autonumber
+    actor Investigator
+    participant Web as Next.js Dashboard
+    participant API as FastAPI Verification API
+    participant Authz as Authorization Service
+    participant Verify as Verification Service
+    participant DB as PostgreSQL
+    participant Storage as S3 or MinIO
+    participant Key as RSA or KMS Key Service
+    participant Crypto as Decryption Service
+    participant Hash as Hashing Service
+    participant Sign as Signature Service
+    participant Custody as Chain-of-Custody Service
+    participant Audit as Audit Service
+    participant Notify as Notification Service
+
+    Investigator->>Web: Select Verify integrity
+    Web->>API: POST /api/v1/evidence/{id}/verify
+    API->>Authz: Check evidence-verification permission
+
+    alt Verification not authorized
+        Authz-->>API: Access denied
+        API->>Audit: Record denied verification
+        Audit->>DB: Persist audit event
+        API-->>Web: 403 Forbidden
+        Web-->>Investigator: Display access error
+    else Verification authorized
+        Authz-->>API: Access granted
+        API->>Verify: Verify evidence authenticity and integrity
+        Verify->>DB: Load trusted hash, signature, manifest, and key reference
+        DB-->>Verify: Trusted verification metadata
+        Verify->>Storage: Retrieve encrypted evidence object
+        Storage-->>Verify: Ciphertext object
+        Verify->>Key: Unwrap AES key
+        Key-->>Verify: Authorized data key
+        Verify->>Crypto: Decrypt in controlled workspace
+        Crypto-->>Verify: Decrypted evidence
+        Verify->>Hash: Calculate current SHA-256 hash
+        Hash-->>Verify: Current hash
+        Verify->>Sign: Validate manifest digital signature
+        Sign-->>Verify: Signature result
+
+        alt Signature invalid
+            Verify->>DB: Mark authenticity check failed
+            Verify->>Notify: Raise security incident
+            Notify-->>Investigator: Authenticity failure alert
+            Verify->>Custody: Append failed-verification event
+            Custody->>DB: Persist custody record
+            Verify->>Audit: Record signature failure
+            Audit->>DB: Persist audit event
+            Verify-->>API: Verification failed
+            API-->>Web: 409 Authenticity failure
+        else Signature valid
+            Verify->>Verify: Compare current and trusted hashes
+
+            alt Hash mismatch
+                Verify->>DB: Mark evidence integrity compromised
+                Verify->>Notify: Raise integrity incident
+                Notify-->>Investigator: Integrity failure alert
+                Verify->>Custody: Append failed-verification event
+                Custody->>DB: Persist custody record
+                Verify->>Audit: Record hash mismatch
+                Audit->>DB: Persist audit event
+                Verify-->>API: Verification failed
+                API-->>Web: 409 Integrity failure
+            else Hash matches
+                Verify->>DB: Store successful verification result
+                Verify->>Custody: Append successful-verification event
+                Custody->>DB: Persist custody record
+                Verify->>Audit: Record successful verification
+                Audit->>DB: Persist audit event
+                Verify-->>API: Verified status and report
+                API-->>Web: 200 Evidence verified
+                Web-->>Investigator: Display verification report
+            end
+        end
+    end
