@@ -1,0 +1,39 @@
+name: secure-surveillance-rtsp-test
+
+services:
+  rtsp-server:
+    image: bluenviron/mediamtx:1
+    container_name: secure-surveillance-rtsp-server
+    restart: unless-stopped
+
+    ports:
+      - "8554:8554"
+
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+
+    networks:
+      - rtsp-test-network
+
+  rtsp-publisher:
+    build:
+      context: .
+      dockerfile: publisher.Dockerfile
+
+    container_name: secure-surveillance-rtsp-publisher
+    restart: unless-stopped
+
+    environment:
+      RTSP_TARGET: rtsp://rtsp-server:8554/synthetic
+      RETRY_DELAY_SECONDS: "1"
+
+    depends_on:
+      rtsp-server:
+        condition: service_started
+
+    networks:
+      - rtsp-test-network
+
+networks:
+  rtsp-test-network:
+    name: secure-surveillance-rtsp-test-network

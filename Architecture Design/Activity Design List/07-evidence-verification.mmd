@@ -1,0 +1,31 @@
+flowchart TD
+    START([Start]) --> A[Investigator selects evidence to verify]
+    A --> B[Authenticate user and check verification permission]
+    B --> C{Authorized?}
+    C -- No --> D[Record denied verification attempt]
+    D --> END([End])
+    C -- Yes --> E[Load trusted hash, signature and metadata]
+    E --> F[Retrieve encrypted evidence object]
+    F --> G{Object retrieved?}
+    G -- No --> H[Record retrieval failure]
+    H --> END
+    G -- Yes --> I[Retrieve wrapped key reference]
+    I --> J[Unwrap AES key]
+    J --> K[Decrypt evidence in controlled workspace]
+    K --> L[Calculate current SHA-256 hash]
+    L --> M[Validate digital signature]
+    M --> N{Signature valid?}
+    N -- No --> O[Mark authenticity check failed]
+    O --> P[Raise security incident]
+    P --> Q[Append custody and audit records]
+    Q --> END
+    N -- Yes --> R{Hash matches trusted original?}
+    R -- No --> S[Mark evidence integrity compromised]
+    S --> P
+    R -- Yes --> T[Mark evidence verified]
+    T --> U[Create verification result with verifier and timestamp]
+    U --> V[Persist result]
+    V --> W[Append chain-of-custody verification event]
+    W --> X[Write immutable verification audit record]
+    X --> Y[Display verification report]
+    Y --> END

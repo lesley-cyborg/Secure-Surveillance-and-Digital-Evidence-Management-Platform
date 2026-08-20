@@ -1,0 +1,38 @@
+flowchart TD
+    START([Start]) --> A[User searches for evidence or enters evidence ID]
+    A --> B[Authenticate user and validate token]
+    B --> C{Authenticated?}
+    C -- No --> D[Record authentication failure]
+    D --> END([End])
+    C -- Yes --> E[Load role, permissions and case assignment]
+    E --> F{Authorized for requested evidence?}
+    F -- No --> G[Record denied access]
+    G --> END
+    F -- Yes --> H[Retrieve evidence metadata]
+    H --> I{Evidence exists and is available?}
+    I -- No --> J[Return unavailable response and log event]
+    J --> END
+    I -- Yes --> K[Create chain-of-custody access record]
+    K --> L[Retrieve encrypted object from S3 or MinIO]
+    L --> M{Retrieval successful?}
+    M -- No --> N[Record storage failure]
+    N --> END
+    M -- Yes --> O[Retrieve wrapped key reference]
+    O --> P[Unwrap AES key through authorized key service]
+    P --> Q[Decrypt evidence in controlled workspace]
+    Q --> R[Calculate SHA-256 hash]
+    R --> S{Hash matches trusted original?}
+    S -- No --> T[Block delivery and raise integrity incident]
+    T --> U[Write custody and audit records]
+    U --> END
+    S -- Yes --> V{Requested action?}
+    V -- View --> W[Stream through protected viewer]
+    W --> X[Write completed view audit event]
+    X --> END
+    V -- Download --> Y{Download permission granted?}
+    Y -- No --> G
+    Y -- Yes --> Z[Create controlled export copy]
+    Z --> AA[Apply watermark and export manifest]
+    AA --> AB[Provide time-limited secure download]
+    AB --> AC[Write export custody and audit events]
+    AC --> END

@@ -1,6 +1,33 @@
 from __future__ import annotations
 
+import asyncio
+import os
 from collections.abc import AsyncIterator
+
+from sqlalchemy.exc import DBAPIError
+from sqlalchemy.ext.asyncio import (
+    AsyncConnection,
+    AsyncEngine,
+)
+
+# These must exist before importing any application modules.
+# setdefault preserves real values supplied by your environment.
+os.environ.setdefault(
+    "DATABASE_URL",
+    ("postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/secure_surveillance_test"),
+)
+os.environ.setdefault(
+    "REDIS_URL",
+    "redis://127.0.0.1:6379/15",
+)
+os.environ.setdefault(
+    "JWT_SECRET_KEY",
+    ("phase-6-testing-jwt-secret-key-not-for-production-use-0123456789"),
+)
+os.environ.setdefault(
+    "AI_INGESTION_ENABLED",
+    "false",
+)
 
 import pytest
 import pytest_asyncio
@@ -18,15 +45,21 @@ async def db_session() -> AsyncIterator[AsyncSession]:
     settings = get_settings()
 
     if settings.test_database_url is None:
-        pytest.skip("TEST_DATABASE_URL is required for integration tests")
+        pytest.skip("TEST_DATABASE_URL is required for database integration tests")
 
     test_engine = create_async_engine(
         settings.test_database_url,
         poolclass=NullPool,
         pool_pre_ping=True,
+        connect_args={
+            "ssl": False,
+            "timeout": 30.0,
+        },
     )
 
-    async with test_engine.connect() as connection:
+    connection = await connect_with_retry(test_engine)
+
+    try:
         outer_transaction = await connection.begin()
 
         session_factory = async_sessionmaker(
@@ -43,4 +76,33 @@ async def db_session() -> AsyncIterator[AsyncSession]:
         if outer_transaction.is_active:
             await outer_transaction.rollback()
 
-    await test_engine.dispose()
+    finally:
+        await connection.close()
+        await test_engine.dispose()
+
+
+async def connect_with_retry(
+    engine: AsyncEngine,
+    *,
+    attempts: int = 4,
+) -> AsyncConnection:
+    last_error: BaseException | None = None
+
+    for attempt in range(1, attempts + 1):
+        try:
+            return await engine.connect()
+
+        except (
+            TimeoutError,
+            ConnectionError,
+            OSError,
+            DBAPIError,
+        ) as exc:
+            last_error = exc
+
+            if attempt == attempts:
+                raise
+
+            await asyncio.sleep(0.75 * attempt)
+
+    raise RuntimeError("PostgreSQL connection retries exhausted") from last_error

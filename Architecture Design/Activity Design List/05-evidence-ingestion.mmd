@@ -1,0 +1,32 @@
+flowchart TD
+    START([Start]) --> A[Evidence submitted by AI engine or authorized user]
+    A --> B[Authenticate requester or trusted service]
+    B --> C{Authorized to submit evidence?}
+    C -- No --> D[Record denied submission]
+    D --> END([End])
+    C -- Yes --> E[Validate file, metadata and incident reference]
+    E --> F{Validation successful?}
+    F -- No --> G[Reject package and record failure]
+    G --> END
+    F -- Yes --> H[Scan for malware and corruption]
+    H --> I{File safe and readable?}
+    I -- No --> J[Quarantine file and create security alert]
+    J --> K[Write audit event]
+    K --> END
+    I -- Yes --> L[Generate evidence identifier]
+    L --> M[Calculate original SHA-256 hash]
+    M --> N[Create evidence manifest]
+    N --> O[Generate AES-256 data key]
+    O --> P[Encrypt evidence with AES-256-GCM]
+    P --> Q[Wrap data key with RSA or KMS]
+    Q --> R[Digitally sign evidence manifest]
+    R --> S[Upload encrypted object to S3 or MinIO]
+    S --> T{Upload successful?}
+    T -- No --> U[Record failure and queue retry]
+    U --> K
+    T -- Yes --> V[Persist metadata, hashes, key reference and storage URI]
+    V --> W[Create initial chain-of-custody record]
+    W --> X[Link evidence to incident]
+    X --> Y[Write immutable ingestion audit event]
+    Y --> Z[Return evidence ID and success status]
+    Z --> END

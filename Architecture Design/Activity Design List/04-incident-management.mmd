@@ -1,0 +1,37 @@
+flowchart TD
+    START([Start]) --> A[Incident submitted by AI engine or security officer]
+    A --> B[Authenticate source or user]
+    B --> C{Authorized and trusted?}
+    C -- No --> D[Record authorization failure]
+    D --> END([End])
+    C -- Yes --> E[Validate incident details]
+    E --> F{Valid payload?}
+    F -- No --> G[Record validation failure]
+    G --> END
+    F -- Yes --> H[Check for duplicate or correlated incident]
+    H --> I{Existing incident found?}
+    I -- Yes --> J[Link event to existing incident]
+    I -- No --> K[Create incident ID, severity, priority and status]
+    J --> L[Persist incident update]
+    K --> L
+    L --> M[Notify authorized personnel]
+    M --> N[Security officer reviews incident]
+    N --> O{False positive?}
+    O -- Yes --> P[Mark false positive and record reason]
+    P --> Q[Write audit event]
+    Q --> END
+    O -- No --> R[Confirm incident]
+    R --> S[Assign investigator or response team]
+    S --> T[Create custody and audit records]
+    T --> U[Investigator reviews evidence and adds notes]
+    U --> V{More evidence required?}
+    V -- Yes --> W[Request or ingest additional evidence]
+    W --> U
+    V -- No --> X{Ready for closure?}
+    X -- No --> U
+    X -- Yes --> Y[Validate closure permission]
+    Y --> Z{Authorized?}
+    Z -- No --> U
+    Z -- Yes --> AA[Set final disposition and closure timestamp]
+    AA --> AB[Persist closure and write audit event]
+    AB --> END

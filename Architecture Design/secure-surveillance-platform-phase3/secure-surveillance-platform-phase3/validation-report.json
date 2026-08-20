@@ -1,0 +1,52 @@
+{
+  "status": "passed_with_live_database_pending",
+  "python_syntax": "passed",
+  "sqlalchemy_mapper_configuration": "passed",
+  "orm_table_count": 24,
+  "orm_tables": [
+    "ai_models",
+    "audit_logs",
+    "auth_sessions",
+    "camera_ai_configs",
+    "cameras",
+    "chain_of_custody",
+    "detection_events",
+    "evidence",
+    "evidence_keys",
+    "evidence_transfers",
+    "evidence_verifications",
+    "incident_assignments",
+    "incident_notes",
+    "incidents",
+    "notifications",
+    "permissions",
+    "report_exports",
+    "report_incidents",
+    "reports",
+    "role_permissions",
+    "roles",
+    "sites",
+    "user_roles",
+    "users"
+  ],
+  "expected_tables_present": true,
+  "migration_revisions": [
+    "20260719_0001",
+    "20260719_0002"
+  ],
+  "offline_sql_generation": "passed",
+  "offline_sql_lines": 854,
+  "openapi_version": "3.1.2",
+  "openapi_path_count": 39,
+  "openapi_operation_count": 48,
+  "openapi_rbac_permission_count": 36,
+  "rbac_seed_permission_count": 36,
+  "rbac_permissions_match_openapi": true,
+  "forensic_immutability_triggers": [
+    "trg_audit_logs_immutable",
+    "trg_chain_of_custody_immutable",
+    "trg_chain_of_custody_validate_link"
+  ],
+  "live_database_migration": "not_run_requires_postgresql_or_docker",
+  "test_suite": "not_run_dependencies_not_installed_in_generation_runtime"
+}

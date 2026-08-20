@@ -1,0 +1,591 @@
+classDiagram
+    direction LR
+
+    class User {
+        +UUID id
+        +String email
+        +String username
+        +String passwordHash
+        +String firstName
+        +String lastName
+        +Boolean mfaEnabled
+        +Boolean active
+        +Integer failedLoginAttempts
+        +DateTime lockedUntil
+        +DateTime lastLoginAt
+        +hasPermission(code) Boolean
+        +lock(until) void
+        +recordSuccessfulLogin() void
+        +deactivate() void
+    }
+
+    class Role {
+        +UUID id
+        +String name
+        +String description
+        +Boolean systemRole
+        +grantPermission(permission) void
+        +revokePermission(permission) void
+    }
+
+    class Permission {
+        +UUID id
+        +String code
+        +String resource
+        +String action
+    }
+
+    class UserRole {
+        +UUID userId
+        +UUID roleId
+        +UUID assignedBy
+        +DateTime assignedAt
+        +DateTime expiresAt
+        +isExpired() Boolean
+    }
+
+    class RolePermission {
+        +UUID roleId
+        +UUID permissionId
+        +DateTime grantedAt
+    }
+
+    class AuthSession {
+        +UUID id
+        +UUID userId
+        +String refreshTokenHash
+        +String tokenJti
+        +String ipAddress
+        +DateTime expiresAt
+        +DateTime revokedAt
+        +UUID replacedBySessionId
+        +isActive() Boolean
+        +revoke() void
+        +rotate(replacementId) void
+    }
+
+    class Site {
+        +UUID id
+        +String name
+        +String address
+        +String timezone
+        +Boolean active
+    }
+
+    class Camera {
+        +UUID id
+        +UUID siteId
+        +String cameraCode
+        +String name
+        +String ipAddress
+        +String protocol
+        +String encryptedStreamUrl
+        +String credentialSecretRef
+        +CameraStatus status
+        +DateTime lastSeenAt
+        +activate() void
+        +deactivate() void
+        +markOffline() void
+    }
+
+    class AIModel {
+        +UUID id
+        +String name
+        +String modelType
+        +String version
+        +String framework
+        +String artifactUri
+        +String checksumSha256
+        +Decimal defaultThreshold
+        +Boolean active
+        +activate() void
+        +retire() void
+    }
+
+    class CameraAIConfig {
+        +UUID id
+        +UUID cameraId
+        +UUID aiModelId
+        +Map configuration
+        +Decimal confidenceThreshold
+        +Boolean enabled
+        +updateThreshold(value) void
+    }
+
+    class DetectionEvent {
+        +UUID id
+        +UUID cameraId
+        +UUID aiModelId
+        +UUID incidentId
+        +String eventType
+        +Decimal confidenceScore
+        +Map recognitionResults
+        +Map ocrResults
+        +DateTime detectedAt
+        +isAboveThreshold(value) Boolean
+    }
+
+    class Incident {
+        +UUID id
+        +String incidentNumber
+        +UUID primaryCameraId
+        +String incidentType
+        +Severity severity
+        +String priority
+        +IncidentStatus status
+        +String title
+        +String description
+        +String disposition
+        +DateTime detectedAt
+        +DateTime confirmedAt
+        +DateTime closedAt
+        +confirm() void
+        +markFalsePositive(reason) void
+        +assign(userId, role) void
+        +close(disposition) void
+    }
+
+    class IncidentAssignment {
+        +UUID id
+        +UUID incidentId
+        +UUID assignedUserId
+        +UUID assignedByUserId
+        +String assignmentRole
+        +String status
+        +DateTime assignedAt
+        +DateTime completedAt
+        +complete() void
+    }
+
+    class IncidentNote {
+        +UUID id
+        +UUID incidentId
+        +UUID authorUserId
+        +String content
+        +Boolean internal
+        +DateTime createdAt
+        +edit(content) void
+    }
+
+    class Evidence {
+        +UUID id
+        +String evidenceNumber
+        +UUID incidentId
+        +UUID sourceDetectionId
+        +UUID submittedByUserId
+        +String evidenceType
+        +String originalFilename
+        +String mimeType
+        +Long fileSizeBytes
+        +String storageBucket
+        +String storageObjectKey
+        +String originalSha256
+        +String encryptedSha256
+        +String manifestSha256
+        +String digitalSignature
+        +EvidenceStatus status
+        +DateTime capturedAt
+        +DateTime ingestedAt
+        +markStored() void
+        +markCompromised(reason) void
+        +isAvailable() Boolean
+    }
+
+    class EvidenceKey {
+        +UUID id
+        +UUID evidenceId
+        +String algorithm
+        +String wrappedKey
+        +String keyReference
+        +Integer keyVersion
+        +Boolean active
+        +DateTime rotatedAt
+        +rotate(newReference) void
+        +retire() void
+    }
+
+    class EvidenceVerification {
+        +UUID id
+        +UUID evidenceId
+        +UUID verifiedByUserId
+        +String expectedSha256
+        +String calculatedSha256
+        +Boolean hashMatches
+        +Boolean signatureValid
+        +String verificationStatus
+        +String failureReason
+        +DateTime verifiedAt
+        +passed() Boolean
+    }
+
+    class CustodyRecord {
+        +UUID id
+        +UUID evidenceId
+        +UUID actorUserId
+        +UUID fromUserId
+        +UUID toUserId
+        +UUID previousRecordId
+        +CustodyEventType eventType
+        +String purpose
+        +String sourceIp
+        +Map eventMetadata
+        +String recordHash
+        +String digitalSignature
+        +DateTime occurredAt
+        +verifyLink(previousHash) Boolean
+    }
+
+    class AuditLog {
+        +UUID id
+        +UUID actorUserId
+        +String action
+        +String resourceType
+        +UUID resourceId
+        +String outcome
+        +String sourceIp
+        +String correlationId
+        +Map details
+        +DateTime occurredAt
+    }
+
+    class Notification {
+        +UUID id
+        +UUID recipientUserId
+        +UUID incidentId
+        +UUID evidenceId
+        +NotificationChannel channel
+        +String notificationType
+        +String subject
+        +String message
+        +String status
+        +DateTime sentAt
+        +DateTime readAt
+        +markSent() void
+        +markRead() void
+    }
+
+    class Report {
+        +UUID id
+        +String reportNumber
+        +UUID generatedByUserId
+        +String reportType
+        +String title
+        +Map filters
+        +String storageObjectKey
+        +String fileFormat
+        +String reportSha256
+        +String digitalSignature
+        +String status
+        +DateTime generatedAt
+        +markGenerated() void
+    }
+
+    class ReportExport {
+        +UUID id
+        +UUID reportId
+        +UUID exportedByUserId
+        +String exportFormat
+        +String storageObjectKey
+        +String watermarkReference
+        +DateTime expiresAt
+        +DateTime downloadedAt
+        +isExpired() Boolean
+    }
+
+    class CameraStatus {
+        <<enumeration>>
+        ONLINE
+        OFFLINE
+        DEGRADED
+        DISABLED
+    }
+
+    class IncidentStatus {
+        <<enumeration>>
+        NEW
+        CONFIRMED
+        ASSIGNED
+        INVESTIGATING
+        RESOLVED
+        CLOSED
+        FALSE_POSITIVE
+    }
+
+    class Severity {
+        <<enumeration>>
+        LOW
+        MEDIUM
+        HIGH
+        CRITICAL
+    }
+
+    class EvidenceStatus {
+        <<enumeration>>
+        PENDING
+        STORED
+        VERIFIED
+        COMPROMISED
+        QUARANTINED
+        ARCHIVED
+    }
+
+    class CustodyEventType {
+        <<enumeration>>
+        ACQUIRED
+        VIEWED
+        TRANSFERRED
+        EXPORTED
+        VERIFIED
+        RETURNED
+    }
+
+    class NotificationChannel {
+        <<enumeration>>
+        DASHBOARD
+        EMAIL
+        SMS
+        PUSH
+    }
+
+    class AuthenticationService {
+        +login(email, password, context) AuthResult
+        +verifyMfa(challengeId, code) AuthResult
+        +refresh(refreshToken, context) TokenPair
+        +logout(sessionId) void
+        +revokeAllSessions(userId) void
+    }
+
+    class AuthorizationService {
+        +authorize(userId, permission, resourceId) Boolean
+        +permissionsFor(userId) PermissionSet
+        +canAccessIncident(userId, incidentId) Boolean
+        +canAccessEvidence(userId, evidenceId) Boolean
+    }
+
+    class UserService {
+        +createUser(command) User
+        +assignRole(userId, roleId, assignedBy) void
+        +removeRole(userId, roleId) void
+        +deactivateUser(userId, reason) void
+        +initiateCredentialReset(userId) void
+    }
+
+    class CameraService {
+        +registerCamera(command, administratorId) Camera
+        +testConnection(cameraId) ConnectionResult
+        +configureAI(cameraId, modelId, configuration) CameraAIConfig
+        +updateStatus(cameraId, status) void
+    }
+
+    class AIEngineService {
+        +processFrame(cameraId, frame) DetectionEvent
+        +classifyThreat(event) ThreatAssessment
+        +correlateEvent(event) IncidentReference
+        +publishDetection(event) void
+    }
+
+    class IncidentService {
+        +createFromDetection(event) Incident
+        +createManual(command, userId) Incident
+        +assign(incidentId, userId, assignedBy) IncidentAssignment
+        +addNote(incidentId, authorId, content) IncidentNote
+        +markFalsePositive(incidentId, reason, userId) void
+        +close(incidentId, disposition, userId) void
+    }
+
+    class EvidenceService {
+        +ingest(command, sourceContext) Evidence
+        +retrieve(evidenceId, userId, action) EvidenceStream
+        +export(evidenceId, userId, format) ExportReference
+        +verify(evidenceId, userId) EvidenceVerification
+        +quarantine(evidenceId, reason) void
+    }
+
+    class EncryptionService {
+        +encrypt(plaintext) EncryptedPayload
+        +decrypt(payload, keyReference) BinaryStream
+        +wrapKey(dataKey) WrappedKey
+        +unwrapKey(keyReference) DataKey
+        +sign(data) Signature
+    }
+
+    class IntegrityService {
+        +sha256(data) String
+        +verifyHash(expected, actual) Boolean
+        +verifySignature(data, signature) Boolean
+        +buildManifest(evidence) Manifest
+    }
+
+    class ChainOfCustodyService {
+        +appendEvent(command) CustodyRecord
+        +transfer(evidenceId, fromUserId, toUserId, purpose) CustodyRecord
+        +recordView(evidenceId, userId, context) CustodyRecord
+        +recordExport(evidenceId, userId, destination) CustodyRecord
+        +history(evidenceId) CustodyHistory
+    }
+
+    class AuditService {
+        +record(command) AuditLog
+        +recordSuccess(action, resource, actorId) AuditLog
+        +recordFailure(action, resource, actorId, reason) AuditLog
+        +search(criteria) AuditLogList
+    }
+
+    class NotificationService {
+        +notifyIncident(incidentId, recipients) void
+        +notifyIntegrityFailure(evidenceId, recipients) void
+        +send(notification) DeliveryResult
+        +markRead(notificationId, userId) void
+    }
+
+    class ReportService {
+        +generate(command, userId) Report
+        +export(reportId, userId, format) ReportExport
+        +loadAuthorized(reportId, userId) Report
+    }
+
+    class UserRepository {
+        <<interface>>
+        +findById(id) User
+        +findByEmail(email) User
+        +save(user) User
+        +loadRoles(userId) RoleList
+    }
+
+    class SessionRepository {
+        <<interface>>
+        +save(session) AuthSession
+        +findByJti(jti) AuthSession
+        +revoke(sessionId) void
+        +revokeAll(userId) void
+    }
+
+    class CameraRepository {
+        <<interface>>
+        +findById(id) Camera
+        +findDuplicate(ip, stream) Camera
+        +save(camera) Camera
+        +saveConfig(config) CameraAIConfig
+    }
+
+    class IncidentRepository {
+        <<interface>>
+        +findById(id) Incident
+        +findCorrelated(event) Incident
+        +save(incident) Incident
+        +saveAssignment(assignment) IncidentAssignment
+        +saveNote(note) IncidentNote
+    }
+
+    class EvidenceRepository {
+        <<interface>>
+        +findById(id) Evidence
+        +save(evidence) Evidence
+        +saveKey(key) EvidenceKey
+        +saveVerification(result) EvidenceVerification
+    }
+
+    class CustodyRepository {
+        <<interface>>
+        +latestForEvidence(evidenceId) CustodyRecord
+        +append(record) CustodyRecord
+        +history(evidenceId) CustodyHistory
+    }
+
+    class AuditRepository {
+        <<interface>>
+        +append(log) AuditLog
+        +search(criteria) AuditLogList
+    }
+
+    class ReportRepository {
+        <<interface>>
+        +findById(id) Report
+        +save(report) Report
+        +saveExport(export) ReportExport
+    }
+
+    class ObjectStorage {
+        <<interface>>
+        +put(key, payload) StorageObject
+        +get(key, version) BinaryStream
+        +createSignedDownload(key, expiry) String
+        +quarantine(key) void
+    }
+
+    class KeyManagementService {
+        <<interface>>
+        +wrapKey(dataKey) WrappedKey
+        +unwrapKey(reference) DataKey
+        +sign(data) Signature
+        +verify(data, signature) Boolean
+    }
+
+    User "1" --> "0..*" AuthSession : owns
+    User "1" --> "0..*" UserRole : receives
+    Role "1" --> "0..*" UserRole : assigned
+    Role "1" --> "0..*" RolePermission : grants
+    Permission "1" --> "0..*" RolePermission : included
+
+    Site "1" --> "0..*" Camera : contains
+    Camera "1" --> "0..*" CameraAIConfig : has
+    AIModel "1" --> "0..*" CameraAIConfig : configures
+    Camera "1" --> "0..*" DetectionEvent : produces
+    AIModel "1" --> "0..*" DetectionEvent : generates
+
+    Camera "1" --> "0..*" Incident : primarySource
+    Incident "1" --> "0..*" DetectionEvent : correlates
+    Incident "1" --> "0..*" IncidentAssignment : assignments
+    Incident "1" --> "0..*" IncidentNote : notes
+    Incident "1" --> "0..*" Evidence : contains
+    DetectionEvent "0..1" --> "0..*" Evidence : produces
+
+    Evidence "1" --> "1..*" EvidenceKey : protectedBy
+    Evidence "1" --> "0..*" EvidenceVerification : verifications
+    Evidence "1" --> "1..*" CustodyRecord : custodyHistory
+    CustodyRecord "0..1" --> "0..1" CustodyRecord : previous
+
+    User "1" --> "0..*" AuditLog : acts
+    User "1" --> "0..*" Notification : receives
+    User "1" --> "0..*" Report : generates
+    Report "1" --> "0..*" ReportExport : exports
+
+    Camera --> CameraStatus
+    Incident --> IncidentStatus
+    Incident --> Severity
+    Evidence --> EvidenceStatus
+    CustodyRecord --> CustodyEventType
+    Notification --> NotificationChannel
+
+    AuthenticationService ..> UserRepository
+    AuthenticationService ..> SessionRepository
+    AuthenticationService ..> AuditService
+    AuthorizationService ..> UserRepository
+    UserService ..> UserRepository
+    UserService ..> SessionRepository
+    UserService ..> AuditService
+    CameraService ..> CameraRepository
+    CameraService ..> EncryptionService
+    CameraService ..> AuditService
+    AIEngineService ..> CameraRepository
+    AIEngineService ..> IncidentService
+    IncidentService ..> IncidentRepository
+    IncidentService ..> NotificationService
+    IncidentService ..> AuditService
+    EvidenceService ..> EvidenceRepository
+    EvidenceService ..> ObjectStorage
+    EvidenceService ..> EncryptionService
+    EvidenceService ..> IntegrityService
+    EvidenceService ..> ChainOfCustodyService
+    EvidenceService ..> AuditService
+    EncryptionService ..> KeyManagementService
+    ChainOfCustodyService ..> CustodyRepository
+    ChainOfCustodyService ..> IntegrityService
+    ChainOfCustodyService ..> KeyManagementService
+    ChainOfCustodyService ..> AuditService
+    AuditService ..> AuditRepository
+    ReportService ..> ReportRepository
+    ReportService ..> ObjectStorage
+    ReportService ..> IntegrityService
+    ReportService ..> KeyManagementService
+    ReportService ..> AuditService

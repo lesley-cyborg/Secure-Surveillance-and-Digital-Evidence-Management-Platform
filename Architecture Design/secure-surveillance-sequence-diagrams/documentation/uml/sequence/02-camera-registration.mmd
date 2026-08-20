@@ -1,0 +1,78 @@
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    participant Web as Next.js Dashboard
+    participant API as FastAPI Camera API
+    participant Authz as Authorization Service
+    participant Camera as Camera Service
+    participant Gateway as Camera or Secure Gateway
+    participant Crypto as Credential Encryption Service
+    participant DB as PostgreSQL
+    participant Audit as Audit Service
+
+    Admin->>Web: Open camera management
+    Web-->>Admin: Display registered cameras
+    Admin->>Web: Enter camera details
+    Web->>API: POST /api/v1/cameras
+    API->>Authz: Validate JWT and camera-management permission
+
+    alt Administrator not authorized
+        Authz-->>API: Access denied
+        API->>Audit: Record denied registration
+        Audit->>DB: Persist audit event
+        API-->>Web: 403 Forbidden
+        Web-->>Admin: Display authorization error
+    else Administrator authorized
+        Authz-->>API: Access granted
+        API->>Camera: Validate registration request
+
+        alt Invalid camera data
+            Camera-->>API: Validation errors
+            API-->>Web: 422 Validation error
+            Web-->>Admin: Display field errors
+        else Camera data valid
+            Camera->>DB: Check duplicate IP, name, or stream URL
+            DB-->>Camera: Duplicate-check result
+
+            alt Duplicate camera found
+                Camera-->>API: Conflict detected
+                API->>Audit: Record duplicate registration attempt
+                Audit->>DB: Persist audit event
+                API-->>Web: 409 Conflict
+                Web-->>Admin: Display duplicate-camera error
+            else No duplicate found
+                Camera->>Gateway: Test network reachability
+
+                alt Camera unreachable
+                    Gateway-->>Camera: Connection failed
+                    Camera-->>API: Reachability test failed
+                    API->>Audit: Record connectivity failure
+                    Audit->>DB: Persist audit event
+                    API-->>Web: 422 Camera unreachable
+                    Web-->>Admin: Display connectivity error
+                else Camera reachable
+                    Gateway-->>Camera: Connection established
+                    Camera->>Gateway: Authenticate and validate RTSP or ONVIF stream
+                    Gateway-->>Camera: Authentication and stream result
+
+                    alt Authentication or stream validation failed
+                        Camera-->>API: Camera validation failed
+                        API->>Audit: Record camera validation failure
+                        Audit->>DB: Persist audit event
+                        API-->>Web: 422 Invalid camera stream
+                        Web-->>Admin: Display stream error
+                    else Camera validated
+                        Camera->>Crypto: Encrypt camera credentials
+                        Crypto-->>Camera: Encrypted credential reference
+                        Camera->>DB: Create camera and default AI settings
+                        DB-->>Camera: Camera record created
+                        Camera->>Audit: Record successful registration
+                        Audit->>DB: Persist audit event
+                        Camera-->>API: Registered camera
+                        API-->>Web: 201 Camera created
+                        Web-->>Admin: Display active camera
+                    end
+                end
+            end
+        end
+    end

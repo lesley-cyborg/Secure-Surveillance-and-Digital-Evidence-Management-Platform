@@ -12,3 +12,6 @@ htmlcov/
 .vscode/
 dist/
 build/
+# Local forensic cryptographic material
+.secrets/
+**/.secrets/

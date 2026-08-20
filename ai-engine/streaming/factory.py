@@ -7,7 +7,6 @@ from typing import Protocol, runtime_checkable
 from streaming.domain import CameraStreamConfig
 from streaming.manager import ManagedStreamWorker
 
-
 type StreamWorkerBuilder = Callable[
     [CameraStreamConfig],
     ManagedStreamWorker,

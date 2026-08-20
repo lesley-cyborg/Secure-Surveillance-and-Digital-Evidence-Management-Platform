@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +14,9 @@ from app.core.exceptions import AppError, app_error_handler
 from app.core.logging import configure_logging
 from app.core.middleware import CorrelationIdMiddleware, SecurityHeadersMiddleware
 from app.db.session import engine
+from app.modules.ai_ingestion.router import (
+    router as ai_ingestion_router,
+)
 
 settings = get_settings()
 configure_logging(settings.log_level)
@@ -56,6 +59,8 @@ app.add_middleware(
 
 app.add_exception_handler(AppError, app_error_handler)
 app.include_router(api_router, prefix=settings.api_v1_prefix)
+
+app.include_router(ai_ingestion_router)
 
 
 @app.get("/", include_in_schema=False)

@@ -1,0 +1,106 @@
+sequenceDiagram
+    autonumber
+    actor Admin as Administrator
+    actor User as Affected User
+    participant Web as Next.js Dashboard
+    participant API as FastAPI User API
+    participant Authz as Authorization Service
+    participant Users as User Management Service
+    participant DB as PostgreSQL
+    participant Session as Redis Session Store
+    participant Notify as Notification Service
+    participant Audit as Audit Service
+
+    Admin->>Web: Open user management
+    Web->>API: GET /api/v1/users
+    API->>Authz: Check user-management permission
+
+    alt Administrator not authorized
+        Authz-->>API: Access denied
+        API->>Audit: Record denied administrative access
+        Audit->>DB: Persist audit event
+        API-->>Web: 403 Forbidden
+        Web-->>Admin: Display authorization error
+    else Administrator authorized
+        Authz-->>API: Access granted
+        API->>Users: List users within administrative scope
+        Users->>DB: Query users, roles, and account status
+        DB-->>Users: User records
+        Users-->>API: User list
+        API-->>Web: 200 User list
+        Web-->>Admin: Display user management screen
+
+        alt Create user
+            Admin->>Web: Submit new user and role
+            Web->>API: POST /api/v1/users
+            API->>Users: Validate identity, uniqueness, and password policy
+            Users->>DB: Check email and username uniqueness
+            DB-->>Users: Uniqueness result
+
+            alt Duplicate or invalid data
+                Users-->>API: Validation or conflict error
+                API-->>Web: 409 or 422 error
+            else User data valid
+                Users->>DB: Create user and role assignments
+                Users->>Notify: Send account activation message
+                Notify-->>User: Activation notification
+                Users->>Audit: Record user creation
+                Audit->>DB: Persist audit event
+                Users-->>API: Created user
+                API-->>Web: 201 User created
+            end
+        else Update user or assign role
+            Admin->>Web: Submit profile or role changes
+            Web->>API: PATCH /api/v1/users/{id}
+            API->>Authz: Check target scope and role-assignment permission
+            Authz-->>API: Access decision
+
+            alt Change violates policy
+                API->>Audit: Record denied administrative change
+                Audit->>DB: Persist audit event
+                API-->>Web: 403 or 409 error
+            else Change allowed
+                API->>Users: Apply profile and role changes
+                Users->>DB: Persist updated user and assignments
+                Users->>Session: Invalidate permission cache and sessions
+                Users->>Notify: Notify affected user
+                Notify-->>User: Account-change notification
+                Users->>Audit: Record user update
+                Audit->>DB: Persist audit event
+                Users-->>API: Updated user
+                API-->>Web: 200 User updated
+            end
+        else Deactivate user
+            Admin->>Web: Submit deactivation reason
+            Web->>API: POST /api/v1/users/{id}/deactivate
+            API->>Users: Check active assignments and evidence custody
+            Users->>DB: Query assignments and custody obligations
+            DB-->>Users: Dependency result
+
+            alt Active obligations exist
+                Users-->>API: Reassignment required
+                API-->>Web: 409 Reassign duties first
+            else No blocking obligations
+                Users->>DB: Deactivate account
+                Users->>Session: Revoke active sessions and refresh tokens
+                Users->>Notify: Notify affected user
+                Notify-->>User: Account deactivation notice
+                Users->>Audit: Record account deactivation
+                Audit->>DB: Persist audit event
+                Users-->>API: Account deactivated
+                API-->>Web: 200 User deactivated
+            end
+        else Reset credentials
+            Admin->>Web: Initiate credential reset
+            Web->>API: POST /api/v1/users/{id}/credential-reset
+            API->>Users: Create time-limited reset token
+            Users->>DB: Store hashed reset-token record
+            Users->>Session: Revoke existing sessions when required
+            Users->>Notify: Deliver secure reset link
+            Notify-->>User: Credential-reset notification
+            Users->>Audit: Record reset request
+            Audit->>DB: Persist audit event
+            Users-->>API: Reset initiated
+            API-->>Web: 202 Reset initiated
+        end
+    end

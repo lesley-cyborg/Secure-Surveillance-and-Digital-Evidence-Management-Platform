@@ -1,0 +1,32 @@
+flowchart TD
+    START([Start]) --> A[Authorized user opens Reports module]
+    A --> B[Select report type, date range and filters]
+    B --> C[Submit report request]
+    C --> D[Authenticate user and validate token]
+    D --> E{Authorized to generate report?}
+    E -- No --> F[Record denied report request]
+    F --> END([End])
+    E -- Yes --> G[Validate filters and date range]
+    G --> H{Request valid?}
+    H -- No --> I[Return validation errors]
+    I --> B
+    H -- Yes --> J[Query incidents, evidence metadata and camera events]
+    J --> K[Query audit and chain-of-custody records]
+    K --> L[Aggregate statistics and analytics]
+    L --> M{Sensitive information included?}
+    M -- Yes --> N[Apply role-based masking and redaction]
+    M -- No --> O[Generate structured report]
+    N --> O
+    O --> P[Assign report ID, author and timestamp]
+    P --> Q[Calculate SHA-256 report hash]
+    Q --> R[Digitally sign report]
+    R --> S[Store report metadata and secure file reference]
+    S --> T[Write report-generation audit event]
+    T --> U{Requested output?}
+    U -- View --> V[Render report in dashboard]
+    V --> END
+    U -- Export --> W[Create protected PDF or CSV export]
+    W --> X[Generate time-limited download link]
+    X --> Y[Write report-export audit event]
+    Y --> Z[Provide secure download]
+    Z --> END

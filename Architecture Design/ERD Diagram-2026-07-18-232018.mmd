@@ -1,0 +1,350 @@
+erDiagram
+    USERS {
+        uuid id PK
+        varchar email UK
+        varchar username UK
+        varchar password_hash
+        varchar first_name
+        varchar last_name
+        varchar phone
+        boolean mfa_enabled
+        boolean is_active
+        int failed_login_attempts
+        timestamp locked_until
+        timestamp last_login_at
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+    }
+
+    ROLES {
+        uuid id PK
+        varchar name UK
+        varchar description
+        boolean is_system_role
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PERMISSIONS {
+        uuid id PK
+        varchar code UK
+        varchar resource
+        varchar action
+        varchar description
+        timestamp created_at
+    }
+
+    USER_ROLES {
+        uuid user_id PK, FK
+        uuid role_id PK, FK
+        uuid assigned_by FK
+        timestamp assigned_at
+        timestamp expires_at
+    }
+
+    ROLE_PERMISSIONS {
+        uuid role_id PK, FK
+        uuid permission_id PK, FK
+        timestamp granted_at
+    }
+
+    AUTH_SESSIONS {
+        uuid id PK
+        uuid user_id FK
+        varchar refresh_token_hash UK
+        varchar token_jti UK
+        varchar ip_address
+        varchar user_agent
+        timestamp expires_at
+        timestamp revoked_at
+        uuid replaced_by_session_id FK
+        timestamp created_at
+    }
+
+    SITES {
+        uuid id PK
+        varchar name
+        varchar address
+        varchar latitude
+        varchar longitude
+        varchar timezone
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CAMERAS {
+        uuid id PK
+        uuid site_id FK
+        uuid registered_by FK
+        varchar name
+        varchar camera_code UK
+        varchar ip_address
+        varchar protocol
+        varchar stream_url_encrypted
+        varchar credentials_secret_ref
+        varchar status
+        varchar location_description
+        boolean is_active
+        timestamp last_seen_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    AI_MODELS {
+        uuid id PK
+        varchar name
+        varchar model_type
+        varchar version
+        varchar framework
+        varchar artifact_uri
+        varchar checksum_sha256
+        decimal confidence_threshold
+        boolean is_active
+        timestamp deployed_at
+        timestamp created_at
+    }
+
+    CAMERA_AI_CONFIGS {
+        uuid id PK
+        uuid camera_id FK
+        uuid ai_model_id FK
+        json configuration
+        decimal confidence_threshold
+        boolean is_enabled
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    INCIDENTS {
+        uuid id PK
+        varchar incident_number UK
+        uuid primary_camera_id FK
+        uuid created_by_user_id FK
+        varchar source_type
+        varchar incident_type
+        varchar severity
+        varchar priority
+        varchar status
+        varchar title
+        text description
+        varchar disposition
+        timestamp detected_at
+        timestamp confirmed_at
+        timestamp closed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    DETECTION_EVENTS {
+        uuid id PK
+        uuid camera_id FK
+        uuid ai_model_id FK
+        uuid incident_id FK
+        varchar event_type
+        decimal confidence_score
+        json bounding_boxes
+        json recognition_results
+        json ocr_results
+        json contextual_metadata
+        timestamp detected_at
+        timestamp processed_at
+        timestamp created_at
+    }
+
+    INCIDENT_ASSIGNMENTS {
+        uuid id PK
+        uuid incident_id FK
+        uuid assigned_user_id FK
+        uuid assigned_by_user_id FK
+        varchar assignment_role
+        varchar status
+        timestamp assigned_at
+        timestamp completed_at
+    }
+
+    INCIDENT_NOTES {
+        uuid id PK
+        uuid incident_id FK
+        uuid author_user_id FK
+        text content
+        boolean is_internal
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    EVIDENCE {
+        uuid id PK
+        varchar evidence_number UK
+        uuid incident_id FK
+        uuid source_detection_id FK
+        uuid submitted_by_user_id FK
+        varchar source_type
+        varchar evidence_type
+        varchar original_filename
+        varchar mime_type
+        bigint file_size_bytes
+        varchar storage_bucket
+        varchar storage_object_key UK
+        varchar storage_version_id
+        varchar original_sha256
+        varchar encrypted_sha256
+        varchar manifest_sha256
+        varchar digital_signature
+        varchar status
+        timestamp captured_at
+        timestamp ingested_at
+        timestamp created_at
+    }
+
+    EVIDENCE_KEYS {
+        uuid id PK
+        uuid evidence_id FK
+        varchar algorithm
+        varchar wrapped_key
+        varchar key_reference
+        int key_version
+        boolean is_active
+        timestamp rotated_at
+        timestamp created_at
+    }
+
+    EVIDENCE_VERIFICATIONS {
+        uuid id PK
+        uuid evidence_id FK
+        uuid verified_by_user_id FK
+        varchar expected_sha256
+        varchar calculated_sha256
+        boolean hash_matches
+        boolean signature_valid
+        varchar verification_status
+        text failure_reason
+        timestamp verified_at
+    }
+
+    CHAIN_OF_CUSTODY {
+        uuid id PK
+        uuid evidence_id FK
+        uuid actor_user_id FK
+        uuid from_user_id FK
+        uuid to_user_id FK
+        uuid previous_record_id FK
+        varchar event_type
+        text purpose
+        varchar source_ip
+        varchar device_identifier
+        json event_metadata
+        varchar record_hash
+        varchar digital_signature
+        timestamp occurred_at
+        timestamp created_at
+    }
+
+    AUDIT_LOGS {
+        uuid id PK
+        uuid actor_user_id FK
+        varchar action
+        varchar resource_type
+        uuid resource_id
+        varchar outcome
+        varchar source_ip
+        varchar user_agent
+        varchar correlation_id
+        json details
+        timestamp occurred_at
+    }
+
+    NOTIFICATIONS {
+        uuid id PK
+        uuid recipient_user_id FK
+        uuid incident_id FK
+        uuid evidence_id FK
+        varchar channel
+        varchar notification_type
+        varchar subject
+        text message
+        varchar status
+        timestamp sent_at
+        timestamp read_at
+        timestamp created_at
+    }
+
+    REPORTS {
+        uuid id PK
+        varchar report_number UK
+        uuid generated_by_user_id FK
+        varchar report_type
+        varchar title
+        json filters
+        varchar storage_object_key
+        varchar file_format
+        varchar report_sha256
+        varchar digital_signature
+        varchar status
+        timestamp generated_at
+        timestamp created_at
+    }
+
+    REPORT_INCIDENTS {
+        uuid report_id PK, FK
+        uuid incident_id PK, FK
+    }
+
+    REPORT_EXPORTS {
+        uuid id PK
+        uuid report_id FK
+        uuid exported_by_user_id FK
+        varchar export_format
+        varchar storage_object_key
+        varchar watermark_reference
+        timestamp expires_at
+        timestamp downloaded_at
+        timestamp created_at
+    }
+
+    USERS ||--o{ USER_ROLES : receives
+    ROLES ||--o{ USER_ROLES : assigned_to
+    ROLES ||--o{ ROLE_PERMISSIONS : grants
+    PERMISSIONS ||--o{ ROLE_PERMISSIONS : included_in
+    USERS ||--o{ AUTH_SESSIONS : owns
+    AUTH_SESSIONS o|--o| AUTH_SESSIONS : rotates_to
+
+    SITES ||--o{ CAMERAS : contains
+    USERS ||--o{ CAMERAS : registers
+    CAMERAS ||--o{ CAMERA_AI_CONFIGS : uses
+    AI_MODELS ||--o{ CAMERA_AI_CONFIGS : configured_for
+    CAMERAS ||--o{ DETECTION_EVENTS : produces
+    AI_MODELS ||--o{ DETECTION_EVENTS : generates
+
+    CAMERAS ||--o{ INCIDENTS : primary_source
+    USERS ||--o{ INCIDENTS : creates
+    INCIDENTS o|--o{ DETECTION_EVENTS : correlates
+    INCIDENTS ||--o{ INCIDENT_ASSIGNMENTS : has
+    USERS ||--o{ INCIDENT_ASSIGNMENTS : assigned_to
+    USERS ||--o{ INCIDENT_ASSIGNMENTS : assigned_by
+    INCIDENTS ||--o{ INCIDENT_NOTES : contains
+    USERS ||--o{ INCIDENT_NOTES : authors
+
+    INCIDENTS ||--o{ EVIDENCE : contains
+    DETECTION_EVENTS o|--o{ EVIDENCE : produces
+    USERS o|--o{ EVIDENCE : submits
+    EVIDENCE ||--o{ EVIDENCE_KEYS : protected_by
+    EVIDENCE ||--o{ EVIDENCE_VERIFICATIONS : verified_by
+    USERS ||--o{ EVIDENCE_VERIFICATIONS : performs
+    EVIDENCE ||--o{ CHAIN_OF_CUSTODY : has
+    USERS o|--o{ CHAIN_OF_CUSTODY : acts_in
+    USERS o|--o{ CHAIN_OF_CUSTODY : transfers_from
+    USERS o|--o{ CHAIN_OF_CUSTODY : transfers_to
+    CHAIN_OF_CUSTODY o|--o| CHAIN_OF_CUSTODY : follows
+
+    USERS o|--o{ AUDIT_LOGS : generates
+    USERS ||--o{ NOTIFICATIONS : receives
+    INCIDENTS o|--o{ NOTIFICATIONS : triggers
+    EVIDENCE o|--o{ NOTIFICATIONS : concerns
+
+    USERS ||--o{ REPORTS : generates
+    REPORTS ||--o{ REPORT_INCIDENTS : includes
+    INCIDENTS ||--o{ REPORT_INCIDENTS : appears_in
+    REPORTS ||--o{ REPORT_EXPORTS : exported_as
+    USERS ||--o{ REPORT_EXPORTS : exports

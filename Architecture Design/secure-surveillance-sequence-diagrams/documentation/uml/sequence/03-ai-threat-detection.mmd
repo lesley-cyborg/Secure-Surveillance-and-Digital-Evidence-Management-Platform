@@ -1,0 +1,62 @@
+sequenceDiagram
+    autonumber
+    participant Cam as IP Camera
+    participant Gateway as Secure Camera Gateway
+    participant AI as AI Processing Engine
+    participant YOLO as YOLO Detector
+    participant Face as Face Recognition
+    participant OCR as OCR Service
+    participant Cache as Redis Deduplication Cache
+    participant Incident as Incident Service
+    participant Evidence as Evidence Service
+    participant DB as PostgreSQL
+    participant Storage as S3 or MinIO
+    participant Notify as Notification Service
+    participant Audit as Audit Service
+    actor Officer as Security Officer
+
+    Cam->>Gateway: Stream video frames
+    Gateway->>AI: Forward authenticated frames and metadata
+
+    loop Continuous monitoring
+        AI->>AI: Sample and preprocess frame
+        AI->>YOLO: Detect people, vehicles, and objects
+        YOLO-->>AI: Detections and confidence scores
+
+        opt Face present
+            AI->>Face: Identify or compare face
+            Face-->>AI: Face match result
+        end
+
+        opt Vehicle or plate present
+            AI->>OCR: Read license plate or visible text
+            OCR-->>AI: OCR result
+        end
+
+        AI->>AI: Apply zones, schedules, tracking, and threat rules
+
+        alt Threat score below threshold
+            AI->>Audit: Record non-threat telemetry when configured
+        else Threat score above threshold
+            AI->>Cache: Check suppression window and correlated events
+            Cache-->>AI: Correlation result
+
+            alt Correlated incident exists
+                AI->>Incident: Attach detection to open incident
+            else New incident required
+                AI->>Incident: Create incident with severity and priority
+            end
+
+            Incident->>DB: Persist incident and detection metadata
+            DB-->>Incident: Incident saved
+            AI->>Evidence: Submit key frames and event clip
+            Evidence->>Storage: Store encrypted evidence object
+            Storage-->>Evidence: Storage URI and version
+            Evidence->>DB: Persist evidence metadata and hashes
+            Evidence-->>Incident: Evidence reference
+            Incident->>Notify: Publish incident alert
+            Notify-->>Officer: Dashboard, email, SMS, or push alert
+            Incident->>Audit: Record detection and incident events
+            Audit->>DB: Persist audit records
+        end
+    end

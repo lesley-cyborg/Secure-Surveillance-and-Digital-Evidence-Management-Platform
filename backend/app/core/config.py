@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, SecretStr, field_validator
@@ -67,6 +68,53 @@ class Settings(BaseSettings):
             "localhost",
             "127.0.0.1",
         ]
+    )
+
+    # AI-engine service ingestion
+    ai_ingestion_enabled: bool = False
+
+    ai_ingestion_service_token: SecretStr | None = Field(
+        default=None,
+        repr=False,
+    )
+
+    ai_ingestion_max_body_bytes: int = Field(
+        default=1_048_576,
+        ge=1_024,
+        le=10_485_760,
+    )
+
+    ai_evidence_max_body_bytes: int = Field(
+        default=25 * 1024 * 1024,
+        ge=1024,
+        le=100 * 1024 * 1024,
+    )
+
+    evidence_wrapping_public_key_path: Path | None = None
+
+    evidence_wrapping_private_key_path: Path | None = None
+
+    evidence_wrapping_private_key_password: SecretStr | None = Field(
+        default=None,
+        repr=False,
+    )
+
+    evidence_wrapping_key_reference: str = "local://evidence-wrapping/v1"
+
+    evidence_wrapping_key_version: int = Field(
+        default=1,
+        ge=1,
+    )
+
+    evidence_signing_private_key_path: Path | None = None
+    evidence_signing_private_key_password: SecretStr | None = Field(
+        default=None,
+        repr=False,
+    )
+    evidence_signing_key_reference: str = "local://evidence-signing/v1"
+    evidence_signing_key_version: int = Field(
+        default=1,
+        ge=1,
     )
 
     # Object storage

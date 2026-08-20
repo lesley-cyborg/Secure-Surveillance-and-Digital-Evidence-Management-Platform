@@ -1,0 +1,40 @@
+flowchart TD
+    START([Start]) --> A[Authorized user or service initiates evidence action]
+    A --> B[Authenticate actor]
+    B --> C[Load role, permissions and case assignment]
+    C --> D{Action authorized?}
+    D -- No --> E[Record denied custody action]
+    E --> END([End])
+    D -- Yes --> F[Load evidence and current custody state]
+    F --> G{Evidence available and state valid?}
+    G -- No --> H[Block action and record invalid state]
+    H --> END
+    G -- Yes --> I{Custody event type?}
+    I -- Create --> J[Record origin, collector and acquisition details]
+    I -- View --> K[Record access details]
+    I -- Transfer --> L[Validate current and receiving custodians]
+    I -- Export --> M[Record purpose, destination and authorization]
+    I -- Verify --> N[Record integrity-verification result]
+    I -- Return --> O[Record return to secure custody]
+    L --> P{Receiving custodian accepts?}
+    P -- No --> Q[Cancel transfer and record rejection]
+    Q --> END
+    P -- Yes --> R[Capture transfer reason and authorization]
+    J --> S[Capture actor, device, IP address and timestamp]
+    K --> S
+    M --> S
+    N --> S
+    O --> S
+    R --> S
+    S --> T[Reference previous custody record]
+    T --> U[Calculate custody-record hash]
+    U --> V[Digitally sign custody record]
+    V --> W[Persist append-only custody event]
+    W --> X{Persistence successful?}
+    X -- No --> Y[Block evidence action and raise custody alert]
+    Y --> Z[Write audit event]
+    Z --> END
+    X -- Yes --> AA[Execute authorized evidence action]
+    AA --> AB[Write corresponding immutable audit event]
+    AB --> AC[Display updated custody history]
+    AC --> END

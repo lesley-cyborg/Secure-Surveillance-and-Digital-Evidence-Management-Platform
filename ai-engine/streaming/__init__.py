@@ -1,3 +1,11 @@
+from streaming.detection_dispatcher import (
+    DetectionEventDispatcher,
+    DetectionEventDispatcherClosedError,
+    DetectionEventDispatcherConfig,
+    DetectionEventDispatcherError,
+    DetectionEventDispatcherSnapshot,
+    EventQueueOverflowPolicy,
+)
 from streaming.domain import (
     CameraStreamConfig,
     FrameArray,
@@ -5,6 +13,13 @@ from streaming.domain import (
     StreamRuntimeSnapshot,
     StreamState,
     StreamTransport,
+)
+from streaming.event_sink import (
+    ManagedStreamDetectionEventSink,
+    NullStreamDetectionEventSink,
+    PermanentStreamDetectionEventDeliveryError,
+    StreamDetectionEventDeliveryError,
+    StreamDetectionEventSink,
 )
 from streaming.exceptions import (
     FrameQueueClosedError,
@@ -21,6 +36,11 @@ from streaming.exceptions import (
     StreamSourceError,
     StreamWorkerAlreadyRegisteredError,
     StreamWorkerNotRegisteredError,
+)
+from streaming.factory import (
+    CallableStreamWorkerFactory,
+    StreamWorkerBuilder,
+    StreamWorkerFactory,
 )
 from streaming.frame_queue import (
     FramePublishResult,
@@ -50,17 +70,19 @@ from streaming.worker import (
     DetectionResultHandler,
     FrameProcessingFunction,
 )
-from streaming.factory import (
-    CallableStreamWorkerFactory,
-    StreamWorkerBuilder,
-    StreamWorkerFactory,
-)
 
 __all__ = [
+    "CallableStreamWorkerFactory",
     "CameraStreamConfig",
     "ContinuousDetectionWorker",
     "ContinuousDetectionWorkerSnapshot",
+    "DetectionEventDispatcher",
+    "DetectionEventDispatcherClosedError",
+    "DetectionEventDispatcherConfig",
+    "DetectionEventDispatcherError",
+    "DetectionEventDispatcherSnapshot",
     "DetectionResultHandler",
+    "EventQueueOverflowPolicy",
     "FrameArray",
     "FrameProcessingFunction",
     "FramePublishResult",
@@ -71,10 +93,18 @@ __all__ = [
     "FrameSampler",
     "FrameSamplerSnapshot",
     "LatestFrameQueue",
+    "ManagedStreamDetectionEventSink",
     "ManagedStreamWorker",
     "ManagedWorkerSnapshot",
     "MonotonicClock",
+    "NullStreamDetectionEventSink",
     "OpenCvRtspSource",
+    "PermanentStreamDetectionEventDeliveryError",
+    "StreamBoundingBox",
+    "StreamDetection",
+    "StreamDetectionEvent",
+    "StreamDetectionEventDeliveryError",
+    "StreamDetectionEventSink",
     "StreamDisabledError",
     "StreamFrame",
     "StreamManager",
@@ -82,6 +112,7 @@ __all__ = [
     "StreamManagerError",
     "StreamManagerOperationError",
     "StreamManagerSnapshot",
+    "StreamModelIdentity",
     "StreamNotOpenError",
     "StreamOpenError",
     "StreamReadError",
@@ -91,13 +122,12 @@ __all__ = [
     "StreamState",
     "StreamTransport",
     "StreamWorkerAlreadyRegisteredError",
+    "StreamWorkerBuilder",
     "StreamWorkerDisposedError",
     "StreamWorkerError",
+    "StreamWorkerFactory",
     "StreamWorkerNotRegisteredError",
     "StreamingError",
     "WorkerRuntimeView",
     "WorkerSnapshotView",
-    "CallableStreamWorkerFactory",
-    "StreamWorkerBuilder",
-    "StreamWorkerFactory",
 ]

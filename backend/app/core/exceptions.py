@@ -15,15 +15,25 @@ class AppError(Exception):
     details: dict[str, Any] = field(default_factory=dict)
 
 
-async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
+async def app_error_handler(
+    request: Request,
+    exception: Exception,
+) -> JSONResponse:
+    if not isinstance(exception, AppError):
+        raise exception
+
     return JSONResponse(
-        status_code=exc.status_code,
+        status_code=exception.status_code,
         content={
             "error": {
-                "code": exc.code,
-                "message": exc.message,
-                "details": exc.details,
-                "correlationId": getattr(request.state, "correlation_id", None),
+                "code": exception.code,
+                "message": exception.message,
+                "details": exception.details,
+                "correlationId": getattr(
+                    request.state,
+                    "correlation_id",
+                    None,
+                ),
             }
         },
     )

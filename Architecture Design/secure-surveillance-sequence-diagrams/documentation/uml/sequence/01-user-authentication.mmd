@@ -1,0 +1,79 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Web as Next.js Dashboard
+    participant API as FastAPI Auth API
+    participant Rate as Redis Rate Limiter
+    participant Auth as Authentication Service
+    participant DB as PostgreSQL
+    participant MFA as MFA Service
+    participant Token as Token Service
+    participant Session as Redis Session Store
+    participant Audit as Audit Service
+
+    User->>Web: Open login page
+    Web-->>User: Display login form
+    User->>Web: Submit email and password
+    Web->>API: POST /api/v1/auth/login
+    API->>API: Validate request schema
+    API->>Rate: Check IP and account limits
+
+    alt Rate limit exceeded
+        Rate-->>API: Deny request
+        API->>Audit: Record throttled login attempt
+        Audit->>DB: Persist audit event
+        API-->>Web: 429 Too many requests
+        Web-->>User: Display retry message
+    else Request allowed
+        Rate-->>API: Allow request
+        API->>Auth: Authenticate credentials
+        Auth->>DB: Load user and security state
+        DB-->>Auth: User record or not found
+
+        alt User missing, disabled, or locked
+            Auth->>Audit: Record blocked login attempt
+            Audit->>DB: Persist audit event
+            Auth-->>API: Authentication failed
+            API-->>Web: 401 Generic login error
+            Web-->>User: Display login failure
+        else Account available
+            Auth->>Auth: Verify password hash
+
+            alt Password invalid
+                Auth->>Rate: Increment failed-attempt counter
+                Rate-->>Auth: Updated failure count
+                Auth->>Audit: Record failed login
+                Audit->>DB: Persist audit event
+                Auth-->>API: Authentication failed
+                API-->>Web: 401 Generic login error
+                Web-->>User: Display login failure
+            else Password valid
+                Auth->>Rate: Reset failed-attempt counter
+                Auth->>DB: Load roles and permissions
+                DB-->>Auth: RBAC claims
+
+                opt MFA enabled
+                    Auth->>MFA: Create one-time challenge
+                    MFA-->>User: Deliver verification code
+                    Auth-->>API: MFA required
+                    API-->>Web: 202 MFA challenge
+                    Web-->>User: Display MFA form
+                    User->>Web: Submit verification code
+                    Web->>API: POST /api/v1/auth/mfa/verify
+                    API->>MFA: Validate code and expiry
+                    MFA-->>API: Verification result
+                end
+
+                API->>Token: Issue access and refresh tokens
+                Token->>Session: Store hashed refresh token and JTI
+                Session-->>Token: Session stored
+                Token-->>API: Tokens and expiry metadata
+                API->>DB: Update last-login metadata
+                API->>Audit: Record successful login
+                Audit->>DB: Persist audit event
+                API-->>Web: 200 User profile and tokens
+                Web->>Web: Initialize secure session
+                Web-->>User: Redirect to authorized dashboard
+            end
+        end
+    end

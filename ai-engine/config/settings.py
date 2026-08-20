@@ -3,8 +3,9 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from string import hexdigits
+from typing import Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -25,6 +26,50 @@ class Settings(BaseSettings):
     service_name: str = "secure-surveillance-ai-engine"
     service_version: str = "0.1.0"
     environment: str = "development"
+
+    backend_incident_sink_enabled: bool = False
+
+    backend_incident_endpoint_url: str | None = None
+
+    backend_service_token: SecretStr | None = Field(
+        default=None,
+        repr=False,
+    )
+
+    backend_incident_connect_timeout_seconds: float = Field(
+        default=5.0,
+        gt=0,
+        le=300,
+    )
+    backend_incident_read_timeout_seconds: float = Field(
+        default=10.0,
+        gt=0,
+        le=300,
+    )
+    backend_incident_write_timeout_seconds: float = Field(
+        default=10.0,
+        gt=0,
+        le=300,
+    )
+    backend_incident_pool_timeout_seconds: float = Field(
+        default=5.0,
+        gt=0,
+        le=300,
+    )
+
+    backend_incident_maximum_connections: int = Field(
+        default=20,
+        ge=1,
+        le=1_000,
+    )
+    backend_incident_maximum_keepalive_connections: int = Field(
+        default=10,
+        ge=0,
+        le=1_000,
+    )
+
+    backend_incident_verify_tls: bool = True
+    backend_incident_allow_insecure_http: bool = False
 
     maximum_upload_bytes: int = Field(
         default=10 * 1024 * 1024,
@@ -57,6 +102,83 @@ class Settings(BaseSettings):
         gt=0,
         le=120,
     )
+    stream_jpeg_quality: int = Field(
+        default=90,
+        ge=1,
+        le=100,
+    )
+
+    stream_reconnect_initial_delay_seconds: float = Field(
+        default=1.0,
+        gt=0,
+        le=60,
+    )
+    stream_reconnect_multiplier: float = Field(
+        default=2.0,
+        ge=1,
+        le=10,
+    )
+    stream_reconnect_maximum_delay_seconds: float = Field(
+        default=30.0,
+        gt=0,
+        le=300,
+    )
+    stream_reconnect_jitter_ratio: float = Field(
+        default=0.2,
+        ge=0,
+        le=1,
+    )
+    stream_reconnect_maximum_attempts: int | None = Field(
+        default=None,
+        ge=0,
+    )
+    stream_event_queue_capacity: int = Field(
+        default=1_000,
+        ge=1,
+        le=100_000,
+    )
+    stream_event_delivery_workers: int = Field(
+        default=1,
+        ge=1,
+        le=32,
+    )
+    stream_event_delivery_timeout_seconds: float = Field(
+        default=10.0,
+        gt=0,
+        le=300,
+    )
+
+    stream_event_retry_initial_delay_seconds: float = Field(
+        default=0.5,
+        gt=0,
+        le=60,
+    )
+    stream_event_retry_multiplier: float = Field(
+        default=2.0,
+        ge=1,
+        le=10,
+    )
+    stream_event_retry_maximum_delay_seconds: float = Field(
+        default=30.0,
+        gt=0,
+        le=300,
+    )
+    stream_event_retry_maximum_attempts: int = Field(
+        default=5,
+        ge=1,
+        le=100,
+    )
+
+    stream_event_shutdown_timeout_seconds: float = Field(
+        default=15.0,
+        gt=0,
+        le=300,
+    )
+
+    stream_event_overflow_policy: Literal[
+        "drop_oldest",
+        "drop_newest",
+    ] = "drop_oldest"
 
     production_model_enabled: bool = False
 
