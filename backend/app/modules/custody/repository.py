@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models.enums import (
@@ -133,3 +133,38 @@ class CustodyRepository:
         result = await self.session.execute(statement)
 
         return result.scalar_one_or_none()
+
+    async def list(
+        self,
+        *,
+        evidence_id: UUID,
+        page: int = 1,
+        page_size: int = 25,
+    ) -> tuple[list[CustodyRecord], int]:
+        """Return paginated custody records and total count."""
+
+        count_stmt = (
+            select(func.count())
+            .select_from(CustodyRecord)
+            .where(CustodyRecord.evidence_id == evidence_id)
+        )
+
+        count_result = await self.session.execute(count_stmt)
+        total = count_result.scalar() or 0
+
+        stmt = (
+            select(CustodyRecord)
+            .where(CustodyRecord.evidence_id == evidence_id)
+            .order_by(
+                CustodyRecord.occurred_at.asc(),
+                CustodyRecord.created_at.asc(),
+                CustodyRecord.id.asc(),
+            )
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        )
+
+        result = await self.session.execute(stmt)
+        records = list(result.scalars().all())
+
+        return records, total
