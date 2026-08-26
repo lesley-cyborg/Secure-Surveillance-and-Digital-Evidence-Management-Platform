@@ -7,10 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models.enums import AuditOutcome
 from app.db.models.reporting import AuditLog
-from app.modules.audit.actions import AuditAction
 
 
 class AuditRepository:
+    """Persistence operations for forensic audit events."""
+
     def __init__(
         self,
         session: AsyncSession,
@@ -20,7 +21,7 @@ class AuditRepository:
     async def create(
         self,
         *,
-        action: AuditAction | str,
+        action: str,
         resource_type: str,
         outcome: AuditOutcome,
         correlation_id: str,
@@ -31,17 +32,15 @@ class AuditRepository:
         user_agent: str | None = None,
         details: dict[str, object] | None = None,
     ) -> AuditLog:
-        action_value = action.value if isinstance(action, AuditAction) else action
-
         audit_log = AuditLog(
             actor_user_id=actor_user_id,
-            action=action_value,
-            resource_type=resource_type,
+            action=action.strip(),
+            resource_type=resource_type.strip(),
             resource_id=resource_id,
             outcome=outcome,
             source_ip=source_ip,
             user_agent=user_agent,
-            correlation_id=correlation_id,
+            correlation_id=correlation_id.strip(),
             details=details or {},
             occurred_at=occurred_at,
         )
