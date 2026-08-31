@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from app.core.security import hash_password
@@ -16,7 +16,8 @@ from app.db.models.enums import (
     Priority,
     Severity,
 )
-from app.db.models.evidence import CustodyRecord, Evidence
+from app.db.models.evidence import Evidence
+from app.db.models.identity import User
 from app.db.models.incidents import Incident
 from app.db.models.reporting import AuditLog
 from app.db.models.surveillance import Camera, Site
@@ -25,16 +26,16 @@ from app.modules.custody.errors import (
     CustodyEvidenceNotFoundError,
     CustodyIdempotencyConflictError,
 )
+from app.modules.custody.integrity import build_custody_integrity
 from app.modules.custody.service import (
     AppendCustodyEventCommand,
     CustodyService,
     ListCustodyEventsCommand,
 )
-from app.modules.custody.integrity import build_custody_integrity
 from app.modules.evidence.signing import (
     DigitalSignatureEnvelope,
+    RSAPSSSHA256Signer,
 )
-from app.modules.evidence.signing import RSAPSSSHA256Signer
 from cryptography.hazmat.primitives.asymmetric import rsa
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,7 +43,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 @pytest.fixture
 async def signer() -> RSAPSSSHA256Signer:
-    private_key = rsa.generate_private_key(public_exponent=65537, key_size=4096) <--THIS GUY WA NYOBOKA EISH
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=4096)
     return RSAPSSSHA256Signer(
         public_key=private_key.public_key(),
         private_key=private_key,
@@ -57,7 +58,7 @@ async def custody_service(db_session: AsyncSession, signer: RSAPSSSHA256Signer) 
 
 
 @pytest.fixture
-async def test_user(db_session: AsyncSession):
+async def test_user(db_session: AsyncSession) -> User:
     repo = UserRepository(db_session)
     user = await repo.create(
         email=f"test-{uuid4()}@example.com",
@@ -70,7 +71,7 @@ async def test_user(db_session: AsyncSession):
 
 
 @pytest.fixture
-async def test_evidence(db_session: AsyncSession, test_user):
+async def test_evidence(db_session: AsyncSession, test_user: User,) -> Evidence:
     site = Site(name="Test Site", timezone="UTC")
     db_session.add(site)
     await db_session.flush()
@@ -131,8 +132,8 @@ async def test_append_custody_event_success(
     db_session: AsyncSession,
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     command = AppendCustodyEventCommand(
         evidence_id=test_evidence.id,
         actor_user_id=test_user.id,
@@ -167,8 +168,8 @@ async def test_append_custody_event_idempotency(
     db_session: AsyncSession,
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     idempotency_key = f"idemp-{uuid4().hex}"
     command = AppendCustodyEventCommand(
         evidence_id=test_evidence.id,
@@ -192,8 +193,8 @@ async def test_append_custody_event_idempotency_conflict(
     db_session: AsyncSession,
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     idempotency_key = f"idemp-{uuid4().hex}"
     command1 = AppendCustodyEventCommand(
         evidence_id=test_evidence.id,
@@ -223,8 +224,8 @@ async def test_append_custody_event_idempotency_conflict(
 async def test_append_custody_event_evidence_not_found(
     db_session: AsyncSession,
     custody_service: CustodyService,
-    test_user,
-):
+    test_user: User,
+) -> None:
     command = AppendCustodyEventCommand(
         evidence_id=uuid4(),
         actor_user_id=test_user.id,
@@ -243,8 +244,8 @@ async def test_append_custody_event_invalid_event_type(
     db_session: AsyncSession,
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     command = AppendCustodyEventCommand(
         evidence_id=test_evidence.id,
         actor_user_id=test_user.id,
@@ -263,8 +264,8 @@ async def test_list_custody_events(
     db_session: AsyncSession,
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+)-> None:
     # Create two events
     for i, event_type in enumerate([CustodyEventType.VIEWED, CustodyEventType.EXPORTED]):
         command = AppendCustodyEventCommand(
@@ -298,8 +299,8 @@ async def test_list_custody_events(
 async def test_list_custody_events_evidence_not_found(
     db_session: AsyncSession,
     custody_service: CustodyService,
-    test_user,
-):
+    test_user: User,
+) -> None:
     command = ListCustodyEventsCommand(
         evidence_id=uuid4(),
         actor_user_id=test_user.id,
@@ -315,11 +316,17 @@ async def test_custody_chain_integrity(
     db_session: AsyncSession,
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     # Create three events and verify chain linking
     records = []
-    for i, event_type in enumerate([CustodyEventType.VIEWED, CustodyEventType.EXPORTED, CustodyEventType.VERIFIED]):
+    event_types = [
+        CustodyEventType.VIEWED,
+        CustodyEventType.EXPORTED,
+        CustodyEventType.VERIFIED,
+    ]
+
+    for i, event_type in enumerate(event_types):
         command = AppendCustodyEventCommand(
             evidence_id=test_evidence.id,
             actor_user_id=test_user.id,
@@ -341,14 +348,14 @@ async def test_custody_chain_integrity(
     # Verify hashes are different
     assert records[0].record_hash != records[1].record_hash
     assert records[1].record_hash != records[2].record_hash
-    
-    
+
+
 @pytest.mark.asyncio
 async def test_idempotency_conflict_when_metadata_changes(
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     idempotency_key = f"idemp-{uuid4().hex}"
 
     command1 = AppendCustodyEventCommand(
@@ -379,14 +386,14 @@ async def test_idempotency_conflict_when_metadata_changes(
 
     with pytest.raises(CustodyIdempotencyConflictError):
         await custody_service.append_event(command=command2)
-        
-           
+
+
 @pytest.mark.asyncio
 async def test_append_custody_event_idempotency_conflict_when_metadata_changes(
     custody_service: CustodyService,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     idempotency_key = f"idemp-{uuid4().hex}"
 
     command1 = AppendCustodyEventCommand(
@@ -424,15 +431,15 @@ async def test_append_custody_event_idempotency_conflict_when_metadata_changes(
             command=command2,
         )
 
-         
+
 @pytest.mark.asyncio
 async def test_persisted_custody_record_is_cryptographically_verifiable(
     db_session: AsyncSession,
     custody_service: CustodyService,
     signer: RSAPSSSHA256Signer,
     test_evidence: Evidence,
-    test_user,
-):
+    test_user: User,
+) -> None:
     command = AppendCustodyEventCommand(
         evidence_id=test_evidence.id,
         actor_user_id=test_user.id,
@@ -459,11 +466,19 @@ async def test_persisted_custody_record_is_cryptographically_verifiable(
         from_user_id=custody.from_user_id,
         to_user_id=custody.to_user_id,
         previous_record_id=custody.previous_record_id,
-        previous_record_hash=custody.previous_record_hash,
+        previous_record_hash=(
+            custody.previous_record.record_hash
+            if custody.previous_record is not None
+            else None
+        ),
         transfer_id=custody.transfer_id,
         event_type=custody.event_type,
         purpose=custody.purpose,
-        source_ip=custody.source_ip,
+        source_ip=(
+            str(custody.source_ip)
+            if custody.source_ip is not None
+            else None
+        ),
         device_identifier=custody.device_identifier,
         event_metadata=dict(custody.event_metadata or {}),
         occurred_at=custody.occurred_at,
@@ -479,5 +494,3 @@ async def test_persisted_custody_record_is_cryptographically_verifiable(
         integrity.canonical_bytes,
         envelope,
     )
-
-         
