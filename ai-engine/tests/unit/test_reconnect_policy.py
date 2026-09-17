@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import math
 from collections.abc import Iterator
+from typing import Any
 
 import pytest
 
@@ -244,30 +245,10 @@ async def test_wait_propagates_task_cancellation() -> None:
         "expected_message",
     ),
     [
-        (
-            {
-                "initial_delay_seconds": 0.0,
-            },
-            "initial_delay_seconds",
-        ),
-        (
-            {
-                "initial_delay_seconds": math.inf,
-            },
-            "initial_delay_seconds",
-        ),
-        (
-            {
-                "multiplier": 0.9,
-            },
-            "multiplier",
-        ),
-        (
-            {
-                "multiplier": math.nan,
-            },
-            "multiplier",
-        ),
+        ({"initial_delay_seconds": 0.0}, "initial_delay_seconds"),
+        ({"initial_delay_seconds": math.inf}, "initial_delay_seconds"),
+        ({"multiplier": 0.9}, "multiplier"),
+        ({"multiplier": math.nan}, "multiplier"),
         (
             {
                 "initial_delay_seconds": 5.0,
@@ -275,37 +256,20 @@ async def test_wait_propagates_task_cancellation() -> None:
             },
             "maximum_delay_seconds",
         ),
-        (
-            {
-                "jitter_ratio": -0.1,
-            },
-            "jitter_ratio",
-        ),
-        (
-            {
-                "jitter_ratio": 1.1,
-            },
-            "jitter_ratio",
-        ),
-        (
-            {
-                "maximum_attempts": -1,
-            },
-            "maximum_attempts",
-        ),
+        ({"jitter_ratio": -0.1}, "jitter_ratio"),
+        ({"jitter_ratio": 1.1}, "jitter_ratio"),
+        ({"maximum_attempts": -1}, "maximum_attempts"),
     ],
 )
 def test_config_rejects_invalid_values(
-    configuration: dict[str, float | int],
+    configuration: dict[str, Any],
     expected_message: str,
 ) -> None:
     with pytest.raises(
         ValueError,
         match=expected_message,
     ):
-        ReconnectPolicyConfig(
-            **configuration,
-        )
+        ReconnectPolicyConfig(**configuration)  
 
 
 @pytest.mark.parametrize(

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import (
-    ClassVar,
     Self,
     cast,
 )
@@ -20,6 +19,7 @@ from detection.exceptions import (
 )
 from detection.schemas import DeviceType
 from models.ultralytics_detector import (
+    PredictionModel,
     UltralyticsDetector,
 )
 
@@ -71,12 +71,11 @@ class FakeResult:
 
 
 class FakePredictionModel:
-    names: ClassVar[dict[int, str]] = {
-        0: "person",
-        1: "dog",
-    }
-
     def __init__(self) -> None:
+        self.names: Mapping[int, str] | Sequence[str] = {
+            0: "person",
+            1: "dog",
+        }
         self.predict_calls = 0
 
     def predict(
@@ -115,6 +114,9 @@ def _detector(
     *,
     expected_sha256: str | None = None,
 ) -> UltralyticsDetector:
+    def model_loader(_: Path) -> PredictionModel:
+        return model
+
     return UltralyticsDetector(
         model_path=model_path,
         model_name="test-detector",
@@ -126,7 +128,7 @@ def _detector(
         iou_threshold=0.7,
         allowed_labels=("person",),
         expected_sha256=expected_sha256,
-        model_loader=lambda _: model,
+        model_loader=model_loader,
         cuda_probe=lambda: False,
     )
 

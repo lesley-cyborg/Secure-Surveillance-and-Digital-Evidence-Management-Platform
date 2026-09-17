@@ -320,7 +320,7 @@ async def test_missing_default_model_returns_503() -> None:
 
 
 @pytest.mark.asyncio
-async def test_liveness_endpoint(client) -> None:
+async def test_liveness_endpoint(client: AsyncClient) -> None:
     response = await client.get("/health/live")
 
     assert response.status_code == 200
