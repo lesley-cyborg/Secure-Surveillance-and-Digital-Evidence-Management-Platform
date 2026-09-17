@@ -367,16 +367,10 @@ class CustodyService:
         requested_metadata.pop("correlation_id", None)
 
         return (
-            existing.event_type
-            == command.event_type
-            and existing.purpose
-            == command.purpose
-            and existing.actor_user_id
-            == command.actor_user_id
-            and existing.source_ip
-            == command.source_ip
-            and existing.device_identifier
-            == command.device_identifier
-            and existing_metadata
-            == requested_metadata
+            existing.event_type == command.event_type
+            and existing.purpose == command.purpose
+            and existing.actor_user_id == command.actor_user_id
+            and existing.source_ip == command.source_ip
+            and existing.device_identifier == command.device_identifier
+            and existing_metadata == requested_metadata
         )
