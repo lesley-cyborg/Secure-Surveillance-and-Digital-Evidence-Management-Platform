@@ -17,5 +17,5 @@ AdministratorAccess: TypeAlias = Annotated[
 
 EvidenceReader: TypeAlias = Annotated[
     AuthorizationContext,
-    Depends(require_permission("evidence:read")),
+    Depends(require_permission("evidence.read")),
 ]

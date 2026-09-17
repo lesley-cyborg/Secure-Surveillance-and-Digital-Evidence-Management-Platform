@@ -4,7 +4,6 @@ import hashlib
 import hmac
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
-from typing import cast
 from uuid import UUID, uuid4
 
 import pytest
@@ -28,7 +27,7 @@ from app.modules.auth.service import (
     AuthenticationService,
 )
 from fastapi import FastAPI
-from httpx import ASGITransport, AsyncClient
+from httpx import ASGITransport, AsyncClient, Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -208,10 +207,7 @@ def _create_service(
 ) -> AuthenticationService:
     return AuthenticationService(
         session=session,
-        mfa_challenges=cast(
-            IssuedMfaChallenge,
-            store,
-        ),
+        mfa_challenges=store,
     )
 
 
@@ -283,7 +279,7 @@ async def _verify(
     *,
     challenge_id: UUID,
     code: str,
-):
+) -> Response:
     return await client.post(
         "/api/v1/auth/mfa/verify",
         json={

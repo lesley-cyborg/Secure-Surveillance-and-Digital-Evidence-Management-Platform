@@ -51,7 +51,7 @@ src = ["app", "tests", "migrations"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ASYNC", "S", "RUF"]
-ignore = ["S101"]
+ignore = ["S101", "B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "migrations/versions/*.py" = ["E501"]

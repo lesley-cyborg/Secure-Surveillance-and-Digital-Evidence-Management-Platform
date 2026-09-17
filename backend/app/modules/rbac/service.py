@@ -37,9 +37,7 @@ class RBACOperationContext:
 
 
 def _utc_now() -> datetime:
-    return datetime.now(UTC).replace(
-        microsecond=0
-    )
+    return datetime.now(UTC).replace(microsecond=0)
 
 
 class RBACService:
@@ -64,67 +62,42 @@ class RBACService:
         now = _utc_now()
 
         try:
-            target_user = (
-                await self.users.get_by_id_for_update(
-                    target_user_id,
-                    include_deleted=True,
-                )
+            target_user = await self.users.get_by_id_for_update(
+                target_user_id,
+                include_deleted=True,
             )
 
-            if (
-                target_user is None
-                or target_user.deleted_at is not None
-            ):
-                raise RBACUserNotFoundError(
-                    "target_user_not_found"
-                )
+            if target_user is None or target_user.deleted_at is not None:
+                raise RBACUserNotFoundError("target_user_not_found")
 
-            role = await self.rbac.get_role_by_id(
-                role_id
-            )
+            role = await self.rbac.get_role_by_id(role_id)
 
             if role is None:
-                raise RBACRoleNotFoundError(
-                    "role_not_found"
-                )
+                raise RBACRoleNotFoundError("role_not_found")
 
             await self.rbac.assign_role(
                 user_id=target_user_id,
                 role_id=role_id,
-                assigned_by=(
-                    context.actor_user_id
-                ),
+                assigned_by=(context.actor_user_id),
                 assigned_at=now,
                 expires_at=expires_at,
             )
 
             await self.audit.create(
-                actor_user_id=(
-                    context.actor_user_id
-                ),
-                action=(
-                    AuditAction.RBAC_ROLE_ASSIGNED
-                ),
+                actor_user_id=(context.actor_user_id),
+                action=(AuditAction.RBAC_ROLE_ASSIGNED),
                 resource_type="user_role",
                 resource_id=target_user_id,
                 outcome=AuditOutcome.SUCCESS,
-                correlation_id=(
-                    context.correlation_id
-                ),
+                correlation_id=(context.correlation_id),
                 occurred_at=now,
                 source_ip=context.source_ip,
                 user_agent=context.user_agent,
                 details={
-                    "target_user_id": str(
-                        target_user_id
-                    ),
+                    "target_user_id": str(target_user_id),
                     "role_id": str(role_id),
                     "role_name": role.name,
-                    "expires_at": (
-                        expires_at.isoformat()
-                        if expires_at is not None
-                        else None
-                    ),
+                    "expires_at": (expires_at.isoformat() if expires_at is not None else None),
                 },
             )
 
@@ -144,29 +117,18 @@ class RBACService:
         now = _utc_now()
 
         try:
-            target_user = (
-                await self.users.get_by_id_for_update(
-                    target_user_id,
-                    include_deleted=True,
-                )
+            target_user = await self.users.get_by_id_for_update(
+                target_user_id,
+                include_deleted=True,
             )
 
-            if (
-                target_user is None
-                or target_user.deleted_at is not None
-            ):
-                raise RBACUserNotFoundError(
-                    "target_user_not_found"
-                )
+            if target_user is None or target_user.deleted_at is not None:
+                raise RBACUserNotFoundError("target_user_not_found")
 
-            role = await self.rbac.get_role_by_id(
-                role_id
-            )
+            role = await self.rbac.get_role_by_id(role_id)
 
             if role is None:
-                raise RBACRoleNotFoundError(
-                    "role_not_found"
-                )
+                raise RBACRoleNotFoundError("role_not_found")
 
             removed = await self.rbac.remove_role(
                 user_id=target_user_id,
@@ -174,30 +136,20 @@ class RBACService:
             )
 
             if not removed:
-                raise RBACAssignmentNotFoundError(
-                    "role_assignment_not_found"
-                )
+                raise RBACAssignmentNotFoundError("role_assignment_not_found")
 
             await self.audit.create(
-                actor_user_id=(
-                    context.actor_user_id
-                ),
-                action=(
-                    AuditAction.RBAC_ROLE_REMOVED
-                ),
+                actor_user_id=(context.actor_user_id),
+                action=(AuditAction.RBAC_ROLE_REMOVED),
                 resource_type="user_role",
                 resource_id=target_user_id,
                 outcome=AuditOutcome.SUCCESS,
-                correlation_id=(
-                    context.correlation_id
-                ),
+                correlation_id=(context.correlation_id),
                 occurred_at=now,
                 source_ip=context.source_ip,
                 user_agent=context.user_agent,
                 details={
-                    "target_user_id": str(
-                        target_user_id
-                    ),
+                    "target_user_id": str(target_user_id),
                     "role_id": str(role_id),
                     "role_name": role.name,
                 },

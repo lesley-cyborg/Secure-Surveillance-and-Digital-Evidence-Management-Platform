@@ -7,7 +7,12 @@ from pythonjsonlogger.json import JsonFormatter
 
 
 class PlatformJsonFormatter(JsonFormatter):
-    def add_fields(self, log_record: dict[str, object], record: logging.LogRecord, message_dict: dict[str, object]) -> None:
+    def add_fields(
+        self,
+        log_record: dict[str, object],
+        record: logging.LogRecord,
+        message_dict: dict[str, object],
+    ) -> None:
         super().add_fields(log_record, record, message_dict)
         log_record.setdefault("level", record.levelname)
         log_record.setdefault("logger", record.name)
@@ -34,7 +39,11 @@ def configure_logging(level: str) -> None:
             "root": {"handlers": ["default"], "level": level.upper()},
             "loggers": {
                 "uvicorn": {"handlers": ["default"], "level": level.upper(), "propagate": False},
-                "uvicorn.access": {"handlers": ["default"], "level": level.upper(), "propagate": False},
+                "uvicorn.access": {
+                    "handlers": ["default"],
+                    "level": level.upper(),
+                    "propagate": False,
+                },
             },
         }
     )

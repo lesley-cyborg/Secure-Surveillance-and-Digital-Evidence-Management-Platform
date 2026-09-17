@@ -4,11 +4,19 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import INET, JSONB, UUID as PGUUID
+from sqlalchemy.dialects.postgresql import INET, JSONB
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.models.enums import AuditOutcome, NotificationChannel, NotificationStatus, ReportFormat, ReportStatus, ReportType
+from app.db.models.enums import (
+    AuditOutcome,
+    NotificationChannel,
+    NotificationStatus,
+    ReportFormat,
+    ReportStatus,
+    ReportType,
+)
 from app.db.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin
 
 
@@ -21,15 +29,21 @@ class AuditLog(UUIDPrimaryKeyMixin, Base):
         Index("ix_audit_logs_correlation", "correlation_id"),
     )
 
-    actor_user_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
+    actor_user_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
     action: Mapped[str] = mapped_column(String(128), nullable=False)
     resource_type: Mapped[str] = mapped_column(String(96), nullable=False)
     resource_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True))
-    outcome: Mapped[AuditOutcome] = mapped_column(Enum(AuditOutcome, name="audit_outcome"), nullable=False)
+    outcome: Mapped[AuditOutcome] = mapped_column(
+        Enum(AuditOutcome, name="audit_outcome"), nullable=False
+    )
     source_ip: Mapped[str | None] = mapped_column(INET)
     user_agent: Mapped[str | None] = mapped_column(Text)
     correlation_id: Mapped[str] = mapped_column(String(64), nullable=False)
-    details: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False, default=dict, server_default="{}")
+    details: Mapped[dict[str, object]] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default="{}"
+    )
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
@@ -41,14 +55,26 @@ class Notification(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):
         Index("ix_notifications_evidence", "evidence_id"),
     )
 
-    recipient_user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
-    incident_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True), ForeignKey("incidents.id", ondelete="SET NULL"))
-    evidence_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True), ForeignKey("evidence.id", ondelete="SET NULL"))
-    channel: Mapped[NotificationChannel] = mapped_column(Enum(NotificationChannel, name="notification_channel"), nullable=False)
+    recipient_user_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False
+    )
+    incident_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("incidents.id", ondelete="SET NULL")
+    )
+    evidence_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("evidence.id", ondelete="SET NULL")
+    )
+    channel: Mapped[NotificationChannel] = mapped_column(
+        Enum(NotificationChannel, name="notification_channel"), nullable=False
+    )
     notification_type: Mapped[str] = mapped_column(String(96), nullable=False)
     subject: Mapped[str] = mapped_column(String(255), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[NotificationStatus] = mapped_column(Enum(NotificationStatus, name="notification_status"), nullable=False, default=NotificationStatus.PENDING)
+    status: Mapped[NotificationStatus] = mapped_column(
+        Enum(NotificationStatus, name="notification_status"),
+        nullable=False,
+        default=NotificationStatus.PENDING,
+    )
     sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -61,26 +87,44 @@ class Report(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):
     )
 
     report_number: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
-    generated_by_user_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
-    report_type: Mapped[ReportType] = mapped_column(Enum(ReportType, name="report_type"), nullable=False)
+    generated_by_user_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+    report_type: Mapped[ReportType] = mapped_column(
+        Enum(ReportType, name="report_type"), nullable=False
+    )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    filters: Mapped[dict[str, object]] = mapped_column(JSONB, nullable=False, default=dict, server_default="{}")
+    filters: Mapped[dict[str, object]] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default="{}"
+    )
     storage_object_key: Mapped[str | None] = mapped_column(String(1024))
-    file_format: Mapped[ReportFormat] = mapped_column(Enum(ReportFormat, name="report_format"), nullable=False)
+    file_format: Mapped[ReportFormat] = mapped_column(
+        Enum(ReportFormat, name="report_format"), nullable=False
+    )
     report_sha256: Mapped[str | None] = mapped_column(String(64))
     digital_signature: Mapped[str | None] = mapped_column(Text)
-    status: Mapped[ReportStatus] = mapped_column(Enum(ReportStatus, name="report_status"), nullable=False, default=ReportStatus.QUEUED)
+    status: Mapped[ReportStatus] = mapped_column(
+        Enum(ReportStatus, name="report_status"), nullable=False, default=ReportStatus.QUEUED
+    )
     generated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    incident_links: Mapped[list[ReportIncident]] = relationship(back_populates="report", cascade="all, delete-orphan")
-    exports: Mapped[list[ReportExport]] = relationship(back_populates="report", cascade="all, delete-orphan")
+    incident_links: Mapped[list[ReportIncident]] = relationship(
+        back_populates="report", cascade="all, delete-orphan"
+    )
+    exports: Mapped[list[ReportExport]] = relationship(
+        back_populates="report", cascade="all, delete-orphan"
+    )
 
 
 class ReportIncident(Base):
     __tablename__ = "report_incidents"
 
-    report_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("reports.id", ondelete="CASCADE"), primary_key=True)
-    incident_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("incidents.id", ondelete="RESTRICT"), primary_key=True)
+    report_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("reports.id", ondelete="CASCADE"), primary_key=True
+    )
+    incident_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("incidents.id", ondelete="RESTRICT"), primary_key=True
+    )
 
     report: Mapped[Report] = relationship(back_populates="incident_links")
 
@@ -92,9 +136,15 @@ class ReportExport(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):
         Index("ix_report_exports_expires_at", "expires_at"),
     )
 
-    report_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("reports.id", ondelete="CASCADE"), nullable=False)
-    exported_by_user_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
-    export_format: Mapped[ReportFormat] = mapped_column(Enum(ReportFormat, name="report_format", create_type=False), nullable=False)
+    report_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("reports.id", ondelete="CASCADE"), nullable=False
+    )
+    exported_by_user_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+    export_format: Mapped[ReportFormat] = mapped_column(
+        Enum(ReportFormat, name="report_format", create_type=False), nullable=False
+    )
     storage_object_key: Mapped[str] = mapped_column(String(1024), nullable=False)
     watermark_reference: Mapped[str | None] = mapped_column(String(255))
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

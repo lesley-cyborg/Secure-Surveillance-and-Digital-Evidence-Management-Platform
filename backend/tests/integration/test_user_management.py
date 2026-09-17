@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from app.core.security import (
@@ -13,12 +13,8 @@ from app.modules.auth.repository import (
     AuthSessionRepository,
     UserRepository,
 )
-from app.modules.rbac.repository import (
-    RBACRepository,
-)
-from app.modules.users.schemas import (
-    UserCreateRequest,
-)
+from app.modules.rbac.repository import RBACRepository
+from app.modules.users.schemas import UserCreateRequest
 from app.modules.users.service import (
     UserManagementContext,
     UserManagementService,
@@ -32,7 +28,7 @@ TEST_PASSWORD = "User-Management-Test-Password-123!"
 
 
 def _context(
-    actor_user_id,
+    actor_user_id: UUID,
 ) -> UserManagementContext:
     return UserManagementContext(
         actor_user_id=actor_user_id,

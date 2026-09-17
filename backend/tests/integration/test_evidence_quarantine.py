@@ -665,18 +665,11 @@ async def test_missing_evidence_is_reference_error(
     command = EvidenceQuarantineCommand(
         evidence_id=uuid4(),
         actor_user_id=actor_user_id,
-        reason=(
-            "Missing evidence quarantine "
-            "investigation"
-        ),
-        idempotency_key=(
-            f"quarantine-{uuid4().hex}"
-        ),
+        reason=("Missing evidence quarantine investigation"),
+        idempotency_key=(f"quarantine-{uuid4().hex}"),
         correlation_id=str(uuid4()),
         source_ip="127.0.0.1",
-        user_agent=(
-            "pytest/evidence-quarantine"
-        ),
+        user_agent=("pytest/evidence-quarantine"),
         device_identifier="pytest",
     )
 
@@ -685,45 +678,25 @@ async def test_missing_evidence_is_reference_error(
         signer=signer,
     )
 
-    with pytest.raises(
-        EvidenceQuarantineReferenceError
-    ):
-        await service.quarantine(
-            command=command
-        )
+    with pytest.raises(EvidenceQuarantineReferenceError):
+        await service.quarantine(command=command)
 
     failure_audit = await db_session.scalar(
         select(AuditLog).where(
-            AuditLog.resource_type
-            == "evidence",
-            AuditLog.resource_id
-            == command.evidence_id,
-            AuditLog.actor_user_id
-            == actor_user_id,
-            AuditLog.action
-            == (
-                AuditAction
-                .EVIDENCE_QUARANTINED
-                .value
-            ),
-            AuditLog.outcome
-            == AuditOutcome.FAILURE,
-            AuditLog.correlation_id
-            == command.correlation_id,
+            AuditLog.resource_type == "evidence",
+            AuditLog.resource_id == command.evidence_id,
+            AuditLog.actor_user_id == actor_user_id,
+            AuditLog.action == (AuditAction.EVIDENCE_QUARANTINED.value),
+            AuditLog.outcome == AuditOutcome.FAILURE,
+            AuditLog.correlation_id == command.correlation_id,
         )
     )
 
     assert failure_audit is not None
 
-    assert (
-        failure_audit.details["evidence_id"]
-        == str(command.evidence_id)
-    )
+    assert failure_audit.details["evidence_id"] == str(command.evidence_id)
 
-    assert (
-        failure_audit.details["reason"]
-        == "EvidenceQuarantineReferenceError"
-    )
+    assert failure_audit.details["reason"] == "EvidenceQuarantineReferenceError"
 
 
 @pytest.mark.asyncio

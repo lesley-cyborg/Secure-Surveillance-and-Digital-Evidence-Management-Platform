@@ -13,7 +13,10 @@ from app.db.models.identity import AuthSession
 from app.modules.auth.exceptions import (
     RefreshTokenReuseDetectedError,
 )
-from app.modules.auth.mfa_store import MfaChallenge
+from app.modules.auth.mfa_store import (
+    IssuedMfaChallenge,
+    MfaChallenge,
+)
 from app.modules.auth.repository import (
     AuthSessionRepository,
     UserRepository,
@@ -35,9 +38,25 @@ pytestmark = pytest.mark.integration
 class FakeMfaStore:
     async def issue(
         self,
-        **_: object,
-    ) -> MfaChallenge:
+        *,
+        user_id: UUID,
+        correlation_id: str,
+        source_ip: str | None,
+        user_agent: str | None,
+        now: datetime,
+    ) -> IssuedMfaChallenge:
+        del user_id, correlation_id, source_ip, user_agent, now
         raise AssertionError("MFA should not run in token tests")
+
+    async def consume(
+        self,
+        *,
+        challenge_id: UUID,
+        submitted_code: str,
+        now: datetime,
+    ) -> MfaChallenge | None:
+        del challenge_id, submitted_code, now
+        raise AssertionError("MFA verification should not run in token tests")
 
     async def delete(
         self,

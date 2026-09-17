@@ -3,19 +3,28 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint, func
-from sqlalchemy.dialects.postgresql import INET, UUID as PGUUID
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
+from sqlalchemy.dialects.postgresql import INET
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, UpdatedAtMixin
+from app.db.models.mixins import CreatedAtMixin, UpdatedAtMixin, UUIDPrimaryKeyMixin
 
 
 class User(UUIDPrimaryKeyMixin, CreatedAtMixin, UpdatedAtMixin, Base):
     __tablename__ = "users"
-    __table_args__ = (
-        Index("ix_users_active_created_at", "is_active", "created_at"),
-    )
+    __table_args__ = (Index("ix_users_active_created_at", "is_active", "created_at"),)
 
     email: Mapped[str] = mapped_column(String(320), nullable=False, unique=True)
     username: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
@@ -23,9 +32,15 @@ class User(UUIDPrimaryKeyMixin, CreatedAtMixin, UpdatedAtMixin, Base):
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
     phone: Mapped[str | None] = mapped_column(String(32))
-    mfa_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
-    failed_login_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    mfa_enabled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default="true"
+    )
+    failed_login_attempts: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -46,7 +61,9 @@ class Role(UUIDPrimaryKeyMixin, CreatedAtMixin, UpdatedAtMixin, Base):
 
     name: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
     description: Mapped[str | None] = mapped_column(Text)
-    is_system_role: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    is_system_role: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
     user_assignments: Mapped[list[UserRole]] = relationship(
         back_populates="role",

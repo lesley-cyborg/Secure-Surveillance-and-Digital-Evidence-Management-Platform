@@ -71,7 +71,10 @@ async def test_user(db_session: AsyncSession) -> User:
 
 
 @pytest.fixture
-async def test_evidence(db_session: AsyncSession, test_user: User,) -> Evidence:
+async def test_evidence(
+    db_session: AsyncSession,
+    test_user: User,
+) -> Evidence:
     site = Site(name="Test Site", timezone="UTC")
     db_session.add(site)
     await db_session.flush()
@@ -265,7 +268,7 @@ async def test_list_custody_events(
     custody_service: CustodyService,
     test_evidence: Evidence,
     test_user: User,
-)-> None:
+) -> None:
     # Create two events
     for i, event_type in enumerate([CustodyEventType.VIEWED, CustodyEventType.EXPORTED]):
         command = AppendCustodyEventCommand(
@@ -467,18 +470,12 @@ async def test_persisted_custody_record_is_cryptographically_verifiable(
         to_user_id=custody.to_user_id,
         previous_record_id=custody.previous_record_id,
         previous_record_hash=(
-            custody.previous_record.record_hash
-            if custody.previous_record is not None
-            else None
+            custody.previous_record.record_hash if custody.previous_record is not None else None
         ),
         transfer_id=custody.transfer_id,
         event_type=custody.event_type,
         purpose=custody.purpose,
-        source_ip=(
-            str(custody.source_ip)
-            if custody.source_ip is not None
-            else None
-        ),
+        source_ip=(str(custody.source_ip) if custody.source_ip is not None else None),
         device_identifier=custody.device_identifier,
         event_metadata=dict(custody.event_metadata or {}),
         occurred_at=custody.occurred_at,
