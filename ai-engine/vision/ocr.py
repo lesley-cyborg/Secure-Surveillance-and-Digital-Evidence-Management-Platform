@@ -27,7 +27,7 @@ class TesseractOCR:
     @property
     def is_ready(self) -> bool:
         try:
-            import pytesseract  # type: ignore[import-untyped]
+            import pytesseract
 
             pytesseract.get_tesseract_version()
         except (ImportError, OSError, RuntimeError):
