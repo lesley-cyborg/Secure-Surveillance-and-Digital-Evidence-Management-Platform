@@ -17,6 +17,7 @@ from detection.model_registry import (
 from models.lifecycle import (
     ModelLifecycleManager,
 )
+from vision.analysis import VisionAnalyzer
 
 
 def get_settings_from_app(
@@ -62,3 +63,9 @@ def get_model_lifecycle(
         ModelLifecycleManager,
         request.app.state.model_lifecycle,
     )
+
+
+def get_vision_analyzer(
+    request: Request,
+) -> VisionAnalyzer:
+    return cast(VisionAnalyzer, request.app.state.vision_analyzer)

@@ -64,9 +64,20 @@ services:
     env_file:
       - .env
     environment:
+      # These override the .env file specifically for the Docker container network
       DATABASE_URL: postgresql+asyncpg://surveillance:surveillance@postgres:5432/surveillance
       REDIS_URL: redis://redis:6379/0
       MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: evidence
+      
+      # THIS WAS THE MISSING PIECE causing the Pydantic crash:
+      JWT_SECRET_KEY: "nfLtlq5ZbcLBwJYajwbReNwDRWcW6kChjkMaCBiNyLu3Us3J6MpgANXjLeN0eMY3fWDFKuIBV44L2DUg"
+      
+      # AI Ingestion settings for the container
+      AI_INGESTION_ENABLED: "true"
+      AI_INGESTION_SERVICE_TOKEN: "dev-ai-service-token-change-me"
     ports:
       - "8000:8000"
     depends_on:

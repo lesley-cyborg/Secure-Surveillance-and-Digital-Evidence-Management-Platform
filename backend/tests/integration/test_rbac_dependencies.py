@@ -64,7 +64,7 @@ async def test_database_permission_is_applied_immediately(
     )
 
     permission = Permission(
-        code=f"evidence:test:{suffix}",
+        code=f"evidence.test.{suffix}",
         resource="evidence",
         action=f"test_{suffix}",
         description="RBAC integration permission",
@@ -150,12 +150,12 @@ async def test_permission_factories(
     # Factory behavior is already covered through the database
     # integration test above. This test verifies AND/OR/role wrappers
     # through a minimal authorization context in later expansion.
-    assert callable(require_permission("evidence:read"))
+    assert callable(require_permission("evidence.read"))
 
     assert callable(
         require_any_permission(
-            "evidence:read",
-            "evidence:verify",
+            "evidence.read",
+            "evidence.verify",
         )
     )
 

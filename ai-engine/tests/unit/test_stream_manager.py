@@ -185,16 +185,17 @@ async def test_manager_starts_and_stops_independent_worker() -> None:
 
     await manager.start("camera-001")
 
-    assert first.is_running is True
-    assert second.is_running is False
+    first_running = bool(first.is_running)
+    second_running = bool(second.is_running)
+    assert first_running is True
+    assert second_running is False
 
     await manager.stop("camera-001")
 
-    assert first.is_running is False
+    assert bool(first.is_running) is False
     assert first.start_calls == 1
     assert first.stop_calls == 1
     assert second.start_calls == 0
-
 
 async def test_start_all_runs_workers_concurrently() -> None:
     manager = StreamManager()

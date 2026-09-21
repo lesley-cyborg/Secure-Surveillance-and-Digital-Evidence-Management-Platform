@@ -63,19 +63,12 @@ class UserRepository:
         *,
         include_deleted: bool = False,
     ) -> User | None:
-        statement = select(User).where(
-            func.lower(User.email)
-            == normalize_email(email)
-        )
+        statement = select(User).where(func.lower(User.email) == normalize_email(email))
 
         if not include_deleted:
-            statement = statement.where(
-                User.deleted_at.is_(None)
-            )
+            statement = statement.where(User.deleted_at.is_(None))
 
-        result = await self.session.execute(
-            statement
-        )
+        result = await self.session.execute(statement)
 
         return result.scalar_one_or_none()
 
@@ -85,19 +78,12 @@ class UserRepository:
         *,
         include_deleted: bool = False,
     ) -> User | None:
-        statement = select(User).where(
-            func.lower(User.username)
-            == normalize_username(username)
-        )
+        statement = select(User).where(func.lower(User.username) == normalize_username(username))
 
         if not include_deleted:
-            statement = statement.where(
-                User.deleted_at.is_(None)
-            )
+            statement = statement.where(User.deleted_at.is_(None))
 
-        result = await self.session.execute(
-            statement
-        )
+        result = await self.session.execute(statement)
 
         return result.scalar_one_or_none()
 
@@ -119,13 +105,9 @@ class UserRepository:
         )
 
         if not include_deleted:
-            statement = statement.where(
-                User.deleted_at.is_(None)
-            )
+            statement = statement.where(User.deleted_at.is_(None))
 
-        result = await self.session.scalars(
-            statement
-        )
+        result = await self.session.scalars(statement)
 
         return list(result.all())
 
@@ -134,18 +116,12 @@ class UserRepository:
         *,
         include_deleted: bool = False,
     ) -> int:
-        statement = select(
-            func.count(User.id)
-        )
+        statement = select(func.count(User.id))
 
         if not include_deleted:
-            statement = statement.where(
-                User.deleted_at.is_(None)
-            )
+            statement = statement.where(User.deleted_at.is_(None))
 
-        result = await self.session.scalar(
-            statement
-        )
+        result = await self.session.scalar(statement)
 
         return int(result or 0)
 

@@ -38,4 +38,6 @@ async def readiness(
     )
     if ready:
         return payload
-    return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content=payload.model_dump())
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content=payload.model_dump()
+    )

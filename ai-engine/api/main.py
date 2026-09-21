@@ -35,6 +35,9 @@ from streaming.event_sink import (
 )
 from streaming.factory import StreamWorkerFactory
 from streaming.manager import StreamManager
+from vision.analysis import VisionAnalyzer
+from vision.face import OpenCVFaceDetector
+from vision.ocr import TesseractOCR
 
 logger = structlog.get_logger(__name__)
 
@@ -47,6 +50,7 @@ def create_app(
     stream_worker_factory: StreamWorkerFactory | None = None,
     stream_detection_sink: StreamDetectionEventSink | None = None,
     stream_dead_letter_sink: StreamDetectionEventSink | None = None,
+    vision_analyzer: VisionAnalyzer | None = None,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
     resolved_registry = registry or ModelRegistry()
@@ -74,6 +78,10 @@ def create_app(
         registry=resolved_registry,
         decoder=decoder,
         inference_gate=inference_gate,
+    )
+    resolved_vision_analyzer = vision_analyzer or VisionAnalyzer(
+        ocr=TesseractOCR(),
+        face_detector=OpenCVFaceDetector(),
     )
 
     resolved_stream_detection_sink = (
@@ -171,6 +179,7 @@ def create_app(
     application.state.frame_processor = processor
     application.state.model_lifecycle = resolved_lifecycle
     application.state.inference_gate = inference_gate
+    application.state.vision_analyzer = resolved_vision_analyzer
 
     application.state.stream_manager = stream_manager
     application.state.stream_worker_factory = resolved_stream_worker_factory

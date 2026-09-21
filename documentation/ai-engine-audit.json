@@ -1,0 +1,789 @@
+{
+  "root": "C:\\Users\\Ninja267\\Desktop\\secure-surveillance-platform\\ai-engine",
+  "summary": {
+    "status": "CRITICAL",
+    "total_findings": 10,
+    "critical": 3,
+    "high": 1,
+    "medium": 3,
+    "low": 1,
+    "info": 2
+  },
+  "findings": [
+    {
+      "severity": "MEDIUM",
+      "category": "architecture",
+      "title": "No clear implementation evidence for ocr",
+      "detail": "Expected architecture terminology was not detected in the AI-engine source/configuration.",
+      "file": null,
+      "line": null,
+      "recommendation": "Inspect manually. If this capability is intentionally outside the AI-engine, document the boundary explicitly."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "architecture",
+      "title": "No clear implementation evidence for threat",
+      "detail": "Expected architecture terminology was not detected in the AI-engine source/configuration.",
+      "file": null,
+      "line": null,
+      "recommendation": "Inspect manually. If this capability is intentionally outside the AI-engine, document the boundary explicitly."
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "security",
+      "title": "Possible hard-coded secret",
+      "detail": "A value resembling a hard-coded credential/key was found.",
+      "file": "tests\\integration\\test_backend_event_delivery.py",
+      "line": 168,
+      "recommendation": "Move secrets to environment/secret management and rotate the exposed value if it is real."
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "security",
+      "title": "Possible hard-coded secret",
+      "detail": "A value resembling a hard-coded credential/key was found.",
+      "file": "tests\\unit\\test_backend_incident_sink.py",
+      "line": 63,
+      "recommendation": "Move secrets to environment/secret management and rotate the exposed value if it is real."
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "security",
+      "title": "Possible hard-coded secret",
+      "detail": "A value resembling a hard-coded credential/key was found.",
+      "file": "tests\\unit\\test_backend_incident_sink.py",
+      "line": 89,
+      "recommendation": "Move secrets to environment/secret management and rotate the exposed value if it is real."
+    },
+    {
+      "severity": "HIGH",
+      "category": "models",
+      "title": "No obvious model-loading/inference implementation found",
+      "detail": "The audit could not identify common AI model loading or inference patterns.",
+      "file": null,
+      "line": null,
+      "recommendation": "Confirm whether inference is delegated to another service. If so, document that boundary."
+    },
+    {
+      "severity": "INFO",
+      "category": "boundary",
+      "title": "AI-engine contains evidence/hash terminology",
+      "detail": "This is not automatically a defect, but it requires checking that the AI layer is not taking ownership of backend evidence security.",
+      "file": null,
+      "line": null,
+      "recommendation": "AI should provide evidence bytes and trusted metadata; the backend Evidence Service should remain authoritative for hashing, encryption, storage, custody and audit."
+    },
+    {
+      "severity": "INFO",
+      "category": "integration",
+      "title": "Outbound API/network calls detected",
+      "detail": "The AI-engine communicates with external/backend services.",
+      "file": null,
+      "line": null,
+      "recommendation": "Verify authentication, TLS, timeouts, retries, idempotency, correlation IDs, and error handling against the backend contract."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "concurrency",
+      "title": "Continuous worker loop detected",
+      "detail": "A while True loop exists. This may be intentional for streaming but requires shutdown/backpressure/error handling review.",
+      "file": null,
+      "line": null,
+      "recommendation": "Verify cancellation, graceful shutdown, exception isolation, frame backpressure and resource cleanup."
+    },
+    {
+      "severity": "LOW",
+      "category": "observability",
+      "title": "print() usage detected",
+      "detail": "Direct console output was found.",
+      "file": null,
+      "line": null,
+      "recommendation": "Prefer the project's logging framework for production observability."
+    }
+  ],
+  "inventory": {
+    "file_count": 93,
+    "python_file_count": 89,
+    "python_lines_approx": 15079,
+    "extensions": {
+      ".json": 2,
+      ".toml": 1,
+      ".md": 1,
+      ".py": 89
+    },
+    "directories": [
+      "api",
+      "api\\composition",
+      "api\\dependencies",
+      "api\\routes",
+      "api\\schemas",
+      "config",
+      "detection",
+      "detection\\config",
+      "detection\\models",
+      "detection\\test",
+      "face-recognition",
+      "htmlcov",
+      "integrations",
+      "integrations\\backend",
+      "models",
+      "ocr",
+      "scripts",
+      "streaming",
+      "tests",
+      "tests\\integration",
+      "tests\\unit"
+    ],
+    "ast": {
+      "functions": 630,
+      "classes": 176,
+      "async_functions": 213,
+      "imports": {
+        "streaming": 112,
+        "__future__": 76,
+        "detection": 67,
+        "api": 27,
+        "typing": 24,
+        "collections": 23,
+        "pytest": 21,
+        "numpy": 20,
+        "uuid": 19,
+        "dataclasses": 19,
+        "asyncio": 19,
+        "datetime": 18,
+        "integrations": 16,
+        "fastapi": 12,
+        "config": 10,
+        "structlog": 9,
+        "math": 9,
+        "threading": 8,
+        "models": 7,
+        "cv2": 7,
+        "httpx": 7,
+        "enum": 6,
+        "pathlib": 6,
+        "pydantic": 6,
+        "time": 5,
+        "json": 5,
+        "contextlib": 4,
+        "os": 4,
+        "starlette": 3,
+        "hashlib": 3,
+        "urllib": 3,
+        "importlib": 2,
+        "argparse": 2,
+        "mimetypes": 2,
+        "http": 1,
+        "functools": 1,
+        "string": 1,
+        "pydantic_settings": 1,
+        "statistics": 1,
+        "types": 1,
+        "random": 1,
+        "shutil": 1,
+        "subprocess": 1
+      },
+      "dangerous_calls": []
+    }
+  },
+  "architecture": {
+    "component_keyword_hits": {
+      "detection": [
+        "detection",
+        "detector",
+        "inference"
+      ],
+      "face_recognition": [
+        "face",
+        "identity"
+      ],
+      "ocr": [],
+      "video": [
+        "video",
+        "frame",
+        "rtsp",
+        "camera",
+        "stream",
+        "capture"
+      ],
+      "threat": [],
+      "events": [
+        "event",
+        "detection_event",
+        "result"
+      ],
+      "backend": [
+        "backend",
+        "api",
+        "http",
+        "requests",
+        "httpx",
+        "client",
+        "ingestion",
+        "incident"
+      ],
+      "evidence": [
+        "snapshot"
+      ]
+    },
+    "detected_ai_libraries": {
+      "YOLO/object detection": [
+        "README.md",
+        "config\\settings.py",
+        "models\\ultralytics_detector.py",
+        "scripts\\smoke_test_real_model.py",
+        "tests\\integration\\test_backend_event_delivery.py",
+        "tests\\unit\\test_backend_incident_sink.py",
+        "tests\\unit\\test_detection_dispatcher.py",
+        "tests\\unit\\test_event_serialization.py",
+        "tests\\unit\\test_stream_detection_events.py",
+        "tests\\unit\\test_stream_result_handler.py"
+      ],
+      "YOLO/Ultralytics": [
+        "pyproject.toml",
+        "README.md",
+        "models\\factory.py",
+        "models\\ultralytics_detector.py",
+        "tests\\unit\\test_ultralytics_detector.py"
+      ],
+      "PyTorch": [
+        "detection\\detector.py",
+        "detection\\device.py",
+        "models\\ultralytics_detector.py"
+      ],
+      "OpenCV/video processing": [
+        "pyproject.toml",
+        "detection\\frame_decoder.py",
+        "streaming\\opencv_rtsp_source.py",
+        "api\\composition\\streams.py",
+        "tests\\integration\\test_detection_api.py",
+        "tests\\unit\\test_frame_decoder.py",
+        "tests\\unit\\test_frame_processor.py",
+        "tests\\unit\\test_opencv_rtsp_source.py"
+      ],
+      "ONNX": [
+        "detection\\detector.py"
+      ]
+    }
+  },
+  "tools": {
+    "skipped": false,
+    "results": {
+      "ruff": {
+        "command": [
+          "C:\\Users\\Ninja267\\Desktop\\secure-surveillance-platform\\ai-engine\\.venv\\Scripts\\python.exe",
+          "-m",
+          "ruff",
+          "check",
+          "."
+        ],
+        "returncode": 0,
+        "stdout": "All checks passed!\n",
+        "stderr": ""
+      },
+      "mypy": {
+        "command": [
+          "C:\\Users\\Ninja267\\Desktop\\secure-surveillance-platform\\ai-engine\\.venv\\Scripts\\python.exe",
+          "-m",
+          "mypy",
+          "."
+        ],
+        "returncode": 0,
+        "stdout": "Success: no issues found in 88 source files\n",
+        "stderr": ""
+      },
+      "pytest": {
+        "command": [
+          "C:\\Users\\Ninja267\\Desktop\\secure-surveillance-platform\\ai-engine\\.venv\\Scripts\\python.exe",
+          "-m",
+          "pytest",
+          "-q"
+        ],
+        "returncode": 0,
+        "stdout": ".......................ss............................................... [ 34%]\n........................................................................ [ 68%]\n..................................................................       [100%]\n208 passed, 2 skipped in 11.98s\n",
+        "stderr": ""
+      }
+    }
+  },
+  "implementation": {
+    "matches": []
+  },
+  "security": {
+    "matches": [
+      {
+        "file": "tests\\integration\\test_backend_event_delivery.py",
+        "line": 168,
+        "type": "Possible hard-coded secret"
+      },
+      {
+        "file": "tests\\unit\\test_backend_incident_sink.py",
+        "line": 63,
+        "type": "Possible hard-coded secret"
+      },
+      {
+        "file": "tests\\unit\\test_backend_incident_sink.py",
+        "line": 89,
+        "type": "Possible hard-coded secret"
+      }
+    ]
+  },
+  "models": {
+    "model_files": [
+      "yolo26n.pt",
+      "models\\yolo26n.pt"
+    ],
+    "model_references": []
+  },
+  "evidence_boundary": {
+    "keyword_hits": {
+      "incident": 9,
+      "detection_event": 14,
+      "snapshot": 24,
+      "sha256": 5,
+      "hash": 4,
+      "ingestion": 1
+    }
+  },
+  "api_boundary": {
+    "libraries": {
+      "httpx": 8,
+      "fastapi": 11,
+      "requests": 4
+    },
+    "network_calls": [
+      {
+        "file": "api\\error_handlers.py",
+        "line": 25,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\error_handlers.py",
+        "line": 29,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\error_handlers.py",
+        "line": 33,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\main.py",
+        "line": 180,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\router.py",
+        "line": 190,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "api\\router.py",
+        "line": 57,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\router.py",
+        "line": 92,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\router.py",
+        "line": 154,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\router.py",
+        "line": 171,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "detection\\model_registry.py",
+        "line": 189,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "models\\ultralytics_detector.py",
+        "line": 394,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "scripts\\benchmark_detection_api.py",
+        "line": 72,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "scripts\\smoke_test_real_model.py",
+        "line": 84,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "streaming\\detection_dispatcher.py",
+        "line": 376,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "streaming\\manager.py",
+        "line": 204,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "streaming\\manager.py",
+        "line": 350,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "streaming\\opencv_rtsp_source.py",
+        "line": 321,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "streaming\\opencv_rtsp_source.py",
+        "line": 382,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "streaming\\worker.py",
+        "line": 425,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 176,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 277,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 313,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 376,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 395,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 249,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 260,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 270,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 288,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 324,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "api\\routes\\streams.py",
+        "line": 348,
+        "pattern": "\\.delete\\s*\\("
+      },
+      {
+        "file": "integrations\\backend\\incident_sink.py",
+        "line": 190,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 182,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 219,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 242,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 273,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 303,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 148,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 164,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\integration\\test_detection_api.py",
+        "line": 324,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_latest_frame_queue.py",
+        "line": 43,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_latest_frame_queue.py",
+        "line": 57,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_latest_frame_queue.py",
+        "line": 58,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_latest_frame_queue.py",
+        "line": 73,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_latest_frame_queue.py",
+        "line": 79,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_latest_frame_queue.py",
+        "line": 103,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_latest_frame_queue.py",
+        "line": 108,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_opencv_rtsp_source.py",
+        "line": 64,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 158,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 185,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 189,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 211,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 216,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 224,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 250,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 256,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 263,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 267,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 291,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 330,
+        "pattern": "\\.post\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 220,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 300,
+        "pattern": "\\.get\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_api.py",
+        "line": 296,
+        "pattern": "\\.delete\\s*\\("
+      },
+      {
+        "file": "tests\\unit\\test_stream_manager.py",
+        "line": 155,
+        "pattern": "\\.get\\s*\\("
+      }
+    ]
+  },
+  "concurrency": {
+    "concurrency_constructs": {
+      "asyncio": 21,
+      "queue": 10,
+      "Lock": 9,
+      "Semaphore": 1,
+      "threading": 7
+    },
+    "continuous_loops": [
+      {
+        "file": "streaming\\detection_dispatcher.py",
+        "line": 374
+      },
+      {
+        "file": "streaming\\detection_dispatcher.py",
+        "line": 399
+      },
+      {
+        "file": "streaming\\detection_dispatcher.py",
+        "line": 502
+      },
+      {
+        "file": "streaming\\worker.py",
+        "line": 337
+      },
+      {
+        "file": "streaming\\worker.py",
+        "line": 356
+      },
+      {
+        "file": "streaming\\worker.py",
+        "line": 423
+      },
+      {
+        "file": "tests\\integration\\test_backend_event_delivery.py",
+        "line": 192
+      },
+      {
+        "file": "tests\\integration\\test_concurrent_streams.py",
+        "line": 247
+      },
+      {
+        "file": "tests\\integration\\test_concurrent_streams.py",
+        "line": 264
+      },
+      {
+        "file": "tests\\integration\\test_continuous_detection_worker.py",
+        "line": 189
+      },
+      {
+        "file": "tests\\integration\\test_continuous_detection_worker.py",
+        "line": 431
+      },
+      {
+        "file": "tests\\integration\\test_continuous_detection_worker.py",
+        "line": 564
+      },
+      {
+        "file": "tests\\integration\\test_real_rtsp_reconnect.py",
+        "line": 108
+      }
+    ]
+  },
+  "logging": {
+    "logging_hits": {
+      "logger": 9,
+      "structlog": 9,
+      "print(": 2
+    }
+  },
+  "tests": {
+    "test_file_count": 32,
+    "test_files": [
+      "tests\\__init__.py",
+      "tests\\integration\\test_backend_event_delivery.py",
+      "tests\\integration\\test_concurrent_streams.py",
+      "tests\\integration\\test_continuous_detection_worker.py",
+      "tests\\integration\\test_detection_api.py",
+      "tests\\integration\\test_real_rtsp_reconnect.py",
+      "tests\\integration\\test_real_rtsp_stream.py",
+      "tests\\integration\\__init__.py",
+      "tests\\unit\\test_backend_incident_sink.py",
+      "tests\\unit\\test_backend_sink_composition.py",
+      "tests\\unit\\test_detection_dispatcher.py",
+      "tests\\unit\\test_device.py",
+      "tests\\unit\\test_dispatching_event_sink.py",
+      "tests\\unit\\test_event_serialization.py",
+      "tests\\unit\\test_frame_decoder.py",
+      "tests\\unit\\test_frame_processor.py",
+      "tests\\unit\\test_frame_sampler.py",
+      "tests\\unit\\test_inference_gate.py",
+      "tests\\unit\\test_latest_frame_queue.py",
+      "tests\\unit\\test_model_registry.py",
+      "tests\\unit\\test_opencv_rtsp_source.py",
+      "tests\\unit\\test_reconnect_policy.py",
+      "tests\\unit\\test_schemas.py",
+      "tests\\unit\\test_stream_api.py",
+      "tests\\unit\\test_stream_detection_events.py",
+      "tests\\unit\\test_stream_domain.py",
+      "tests\\unit\\test_stream_manager.py",
+      "tests\\unit\\test_stream_result_handler.py",
+      "tests\\unit\\test_stream_rtsp_source.py",
+      "tests\\unit\\test_stream_source.py",
+      "tests\\unit\\test_stream_worker_factory.py",
+      "tests\\unit\\test_ultralytics_detector.py"
+    ]
+  },
+  "dependencies": {
+    "dependency_files": [
+      "requirements.txt",
+      "pyproject.toml"
+    ]
+  },
+  "documentation": {
+    "documentation_files": [
+      "README.md"
+    ]
+  }
+}

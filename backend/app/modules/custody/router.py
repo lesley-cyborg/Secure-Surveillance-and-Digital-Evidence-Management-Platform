@@ -20,7 +20,7 @@ from app.modules.custody.errors import (
     CustodyEvidenceNotFoundError,
     CustodyIdempotencyConflictError,
 )
-from app.modules.custody.schemas import (
+from app.modules.custody.schema import (
     CreateCustodyEventRequest,
     CustodyEventPageResponse,
     CustodyEventResponse,

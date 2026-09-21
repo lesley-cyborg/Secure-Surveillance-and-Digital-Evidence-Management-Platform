@@ -354,7 +354,17 @@ class CustodyService:
         """
         Determine whether an idempotent replay represents the
         same logical request.
+
+        Correlation ID is intentionally excluded from idempotency
+        identity because retries may legitimately have different
+        correlation IDs.
         """
+
+        existing_metadata = dict(existing.event_metadata or {})
+        requested_metadata = dict(command.event_metadata or {})
+
+        existing_metadata.pop("correlation_id", None)
+        requested_metadata.pop("correlation_id", None)
 
         return (
             existing.event_type == command.event_type
@@ -362,4 +372,5 @@ class CustodyService:
             and existing.actor_user_id == command.actor_user_id
             and existing.source_ip == command.source_ip
             and existing.device_identifier == command.device_identifier
+            and existing_metadata == requested_metadata
         )

@@ -213,6 +213,59 @@ async def test_image_detection_uses_fake_model(
 
 
 @pytest.mark.asyncio
+async def test_image_analysis_uses_bounded_upload_and_correlation_id(
+    client: AsyncClient,
+) -> None:
+    correlation_id = "2c66f4b3-4b33-4c6c-a5b9-bc3c34c3a85e"
+
+    response = await client.post(
+        "/api/v1/analyze/image",
+        headers={"X-Correlation-ID": correlation_id},
+        files={
+            "file": (
+                "camera-frame.jpg",
+                _encoded_jpeg(),
+                "image/jpeg",
+            )
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["X-Correlation-ID"] == correlation_id
+    assert response.json()["ocr"] == []
+    assert response.json()["faces"] == []
+
+
+@pytest.mark.asyncio
+async def test_image_analysis_rejects_oversized_upload() -> None:
+    application = _create_test_app(maximum_upload_bytes=10)
+
+    transport = ASGITransport(app=application)
+
+    async with AsyncClient(
+        transport=transport,
+        base_url="http://test",
+    ) as client:
+        response = await client.post(
+            "/api/v1/analyze/image",
+            headers={"X-Correlation-ID": "f2a4a06b-2b22-4f66-9a45-3cfaa91cd5fc"},
+            files={
+                "file": (
+                    "camera-frame.jpg",
+                    _encoded_jpeg(),
+                    "image/jpeg",
+                )
+            },
+        )
+
+    assert response.status_code == 413
+    assert response.headers["X-Correlation-ID"] == (
+        "f2a4a06b-2b22-4f66-9a45-3cfaa91cd5fc"
+    )
+    assert response.json()["error_code"] == "FrameTooLargeError"
+
+
+@pytest.mark.asyncio
 async def test_unsupported_media_returns_415(
     client: AsyncClient,
 ) -> None:
@@ -320,7 +373,7 @@ async def test_missing_default_model_returns_503() -> None:
 
 
 @pytest.mark.asyncio
-async def test_liveness_endpoint(client) -> None:
+async def test_liveness_endpoint(client: AsyncClient) -> None:
     response = await client.get("/health/live")
 
     assert response.status_code == 200

@@ -62,6 +62,19 @@ class FakeMfaChallengeStore:
             delivery_code="123456",
         )
 
+    async def consume(
+        self,
+        *,
+        challenge_id: UUID,
+        submitted_code: str,
+        now: datetime,
+    ) -> MfaChallenge | None:
+        del challenge_id
+        del submitted_code
+        del now
+
+        return None
+
     async def delete(
         self,
         challenge_id: UUID,
@@ -75,19 +88,6 @@ def login_context() -> LoginContext:
         source_ip="127.0.0.1",
         user_agent="pytest",
     )
-
-    async def consume(
-        self,
-        *,
-        challenge_id: UUID,
-        submitted_code: str,
-        now: datetime,
-    ) -> MfaChallenge | None:
-        del challenge_id
-        del submitted_code
-        del now
-
-        return None
 
 
 async def create_login_user(

@@ -21,6 +21,7 @@ from api.dependencies import (
     get_model_registry,
     get_settings_from_app,
 )
+from api.dependencies.core import get_vision_analyzer
 from api.schemas import (
     ErrorResponse,
     HealthResponse,
@@ -50,8 +51,59 @@ from models.lifecycle import (
     ModelLifecycleManager,
     ModelLifecycleState,
 )
+from vision.analysis import VisionAnalyzer
+from vision.schemas import VisionAnalysisResult
 
 router = APIRouter()
+
+
+@router.post(
+    "/api/v1/analyze/image",
+    response_model=VisionAnalysisResult,
+    tags=["vision"],
+)
+async def analyze_image(
+    response: Response,
+    file: Annotated[UploadFile, File(description="JPEG or PNG surveillance frame")],
+    processor: Annotated[FrameProcessor, Depends(get_frame_processor)],
+    analyzer: Annotated[VisionAnalyzer, Depends(get_vision_analyzer)],
+    settings: Annotated[Settings, Depends(get_settings_from_app)],
+    confidence_threshold: Annotated[float, Form(ge=0, le=1)] = 0.5,
+    supplied_correlation_id: Annotated[
+        UUID | None,
+        Header(alias="X-Correlation-ID"),
+    ] = None,
+) -> VisionAnalysisResult:
+    correlation_id = supplied_correlation_id or uuid4()
+    response.headers["X-Correlation-ID"] = str(correlation_id)
+
+    try:
+        media_type = _resolve_media_type(
+            content_type=file.content_type,
+            correlation_id=correlation_id,
+        )
+        payload = await _read_limited_upload(
+            file,
+            maximum_bytes=settings.maximum_upload_bytes,
+            chunk_size=settings.upload_chunk_size,
+            correlation_id=correlation_id,
+        )
+        result = await processor.process_image(
+            payload=payload,
+            media_type=media_type,
+            confidence_threshold=confidence_threshold,
+            correlation_id=correlation_id,
+        )
+        decoded = processor.decoder.decode_image(payload, media_type)
+        return await analyzer.analyze(
+            decoded.image,
+            detections=tuple(
+                (detection.label, detection.confidence)
+                for detection in result.detections
+            ),
+        )
+    finally:
+        await file.close()
 
 
 @router.get(
