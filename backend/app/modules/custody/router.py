@@ -72,9 +72,7 @@ def _user_agent(request: Request) -> str | None:
     return value[:4096]
 
 
-def _to_response(
-    record: CustodyRecord,
-) -> CustodyEventResponse:
+def _to_response(record: CustodyRecord,) -> CustodyEventResponse:
     return CustodyEventResponse(
         id=record.id,
         evidence_id=record.evidence_id,
@@ -143,8 +141,12 @@ async def list_custody_events(
 
     response.headers["X-Correlation-ID"] = correlation_id
 
-    total_pages = (result.total + page_size - 1) // page_size if page_size > 0 else 0
-
+    total_pages = (
+        (result.total + page_size - 1) // page_size
+        if page_size > 0
+        else 0
+    )
+    
     return CustodyEventPageResponse(
         items=[_to_response(r) for r in result.items],
         pagination=PaginationMeta(

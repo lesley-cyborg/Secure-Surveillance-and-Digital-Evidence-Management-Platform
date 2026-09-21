@@ -13,7 +13,6 @@ from app.modules.audit.actions import AuditAction
 from app.modules.audit.repository import AuditRepository
 from app.modules.auth.repository import UserRepository
 from app.modules.custody.errors import (
-    CustodyActorNotFoundError,
     CustodyEvidenceNotFoundError,
     CustodyIdempotencyConflictError,
 )
@@ -159,6 +158,7 @@ class CustodyService:
         # The database additionally enforces:
         #
         # evidence_id + idempotency_scope + idempotency_key
+        #
         # as a unique lifecycle identity.
         # ---------------------------------------------------------
 

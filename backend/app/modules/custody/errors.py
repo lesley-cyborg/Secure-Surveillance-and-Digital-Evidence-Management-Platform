@@ -15,7 +15,8 @@ class CustodyIdempotencyConflictError(CustodyError):
 
 class CustodyChainIntegrityError(CustodyError):
     """The custody chain link is invalid or corrupted."""
+    
 
-
-class CustodyActorNotFoundError(CustodyError):
-    """The authenticated actor does not exist."""
+class CustodyActorNotFoundError(Exception):
+    """Raised when the custody actor does not exist."""    
+    
