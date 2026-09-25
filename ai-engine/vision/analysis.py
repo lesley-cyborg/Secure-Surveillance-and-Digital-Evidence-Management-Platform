@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import asyncio
 
+import structlog
+
 from detection.detector import FrameArray
-from vision.interfaces import FaceDetector, OCRProvider
-from vision.schemas import ThreatSignal, VisionAnalysisResult, VisionModel
+from vision.interfaces import FaceDetector, OCRProvider, OCRProviderError
+from vision.schemas import OCRText, ThreatSignal, VisionAnalysisResult, VisionModel
+
+logger = structlog.get_logger(__name__)
 
 
 class VisionAnalyzer:
@@ -27,11 +31,21 @@ class VisionAnalyzer:
         *,
         detections: tuple[tuple[str, float], ...] = (),
     ) -> VisionAnalysisResult:
-        ocr = (
-            await asyncio.to_thread(self.ocr.extract, frame)
-            if self.ocr is not None and self.ocr.is_ready
-            else ()
-        )
+        ocr: tuple[OCRText, ...] = ()
+        ocr_model = None
+        if self.ocr is not None and self.ocr.is_ready:
+            try:
+                ocr = await asyncio.to_thread(self.ocr.extract, frame)
+                ocr_model = VisionModel(
+                    name=self.ocr.model[0],
+                    version=self.ocr.model[1],
+                )
+            except OCRProviderError as exception:
+                logger.warning(
+                    "ocr_analysis_degraded",
+                    error_type=type(exception).__name__,
+                )
+
         faces = (
             await asyncio.to_thread(self.face_detector.detect, frame)
             if self.face_detector is not None and self.face_detector.is_ready
@@ -46,9 +60,7 @@ class VisionAnalyzer:
             ocr=ocr,
             faces=faces,
             threat_signals=signals,
-            ocr_model=VisionModel(name=self.ocr.model[0], version=self.ocr.model[1])
-            if self.ocr is not None and self.ocr.is_ready
-            else None,
+            ocr_model=ocr_model,
             face_model=(
                 VisionModel(
                     name=self.face_detector.model[0],

@@ -6,10 +6,13 @@ from uuid import UUID, uuid4
 import numpy as np
 import pytest
 
+from addons.pipeline import AnalysisPipeline
+from addons.schemas import AddonAnalysisResult, BoundingBox, PoseObservation
 from api.composition.stream_results import (
     build_stream_detection_event,
     create_stream_result_handler,
 )
+from config.settings import Settings
 from detection.schemas import (
     Detection,
     DetectionResult,
@@ -186,6 +189,63 @@ async def test_result_handler_publishes_event() -> None:
         event.correlation_id
         == result.correlation_id
     )
+
+
+async def test_result_handler_passes_camera_sequence_to_addon_and_emits_v11() -> None:
+    class ConfirmingPipeline(AnalysisPipeline):
+        def __init__(self) -> None:
+            self.context: tuple[str | None, int | None] | None = None
+
+        async def analyze(
+            self,
+            frame: np.ndarray,
+            *,
+            detections: tuple[tuple[str, float], ...],
+            camera_id: str | None = None,
+            sequence_number: int | None = None,
+        ) -> AddonAnalysisResult:
+            del frame, detections
+            self.context = (camera_id, sequence_number)
+            return AddonAnalysisResult(
+                poses=(
+                    PoseObservation(
+                        posture="person",
+                        confidence=0.9,
+                        bounding_box=BoundingBox(
+                            x_min=0.1,
+                            y_min=0.1,
+                            x_max=0.5,
+                            y_max=0.8,
+                        ),
+                        confirmed=True,
+                    ),
+                ),
+            )
+
+    sink = RecordingEventSink()
+    pipeline = ConfirmingPipeline()
+    settings = Settings(
+        _env_file=None,
+        addon_enabled=True,
+        addon_event_v11_enabled=True,
+    )
+    handler = create_stream_result_handler(
+        sink=sink,
+        settings=settings,
+        addon_pipeline=pipeline,
+    )
+    frame = create_frame()
+
+    await handler(frame, create_result())
+
+    assert pipeline.context == (frame.camera_id, frame.sequence_number)
+    assert sink.events[0].schema_version == "1.1"
+    assert sink.events[0].analysis is not None
+    analysis = sink.events[0].analysis
+    assert analysis is not None
+    poses = analysis["poses"]
+    assert isinstance(poses, list)
+    assert poses[0]["confirmed"] is True
 
 
 async def test_result_handler_rejects_unknown_result() -> None:

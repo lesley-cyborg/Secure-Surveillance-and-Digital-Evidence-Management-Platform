@@ -137,6 +137,7 @@ def create_event(
     model_name: str | None = None,
     model_version: str | None = None,
     include_detection: bool = True,
+    schema_version: str = "1.0",
 ) -> DetectionEventIngestionRequest:
     captured_at = datetime(
         2026,
@@ -169,7 +170,7 @@ def create_event(
 
     return DetectionEventIngestionRequest.model_validate(
         {
-            "schema_version": "1.0",
+            "schema_version": schema_version,
             "event_type": ("camera.detection.completed"),
             "event_id": str(event_id or uuid4()),
             "camera_id": (camera_code or references.camera.camera_code),
@@ -189,6 +190,19 @@ def create_event(
                 "duration_ms": 8.5,
                 "processed_at": captured_at,
             },
+            **(
+                {
+                    "analysis": {
+                        "threat_signals": [],
+                        "weapon_count": 0,
+                        "plates": [],
+                        "poses": [],
+                        "degraded_capabilities": ["plate_ocr"],
+                    }
+                }
+                if schema_version == "1.1"
+                else {}
+            ),
         }
     )
 
@@ -297,6 +311,29 @@ async def test_new_event_is_persisted(
     assert model_metadata["name"] == references.ai_model.name
     assert frame_metadata["sequence_number"] == 42
     assert inference_metadata["duration_ms"] == 8.5
+
+
+async def test_v11_analysis_is_persisted_in_contextual_metadata(
+    db_session: AsyncSession,
+) -> None:
+    references = await seed_references(db_session)
+    event = create_event(references, schema_version="1.1")
+    service = DetectionEventIngestionService(db_session)
+
+    await service.ingest(
+        event=event,
+        idempotency_key=create_idempotency_key(event.event_id),
+    )
+    persisted = await load_event(db_session, source_event_id=event.event_id)
+
+    assert persisted.schema_version == "1.1"
+    assert persisted.contextual_metadata["analysis"] == {
+        "threat_signals": [],
+        "weapon_count": 0,
+        "plates": [],
+        "poses": [],
+        "degraded_capabilities": ["plate_ocr"],
+    }
 
 
 async def test_exact_retry_returns_duplicate(

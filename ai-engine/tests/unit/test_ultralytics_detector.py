@@ -220,6 +220,27 @@ def test_detector_rejects_missing_model(
         detector.load()
 
 
+def test_production_loader_requires_checksum(
+    tmp_path: Path,
+) -> None:
+    path = _model_file(tmp_path)
+    detector = UltralyticsDetector(
+        model_path=path,
+        model_name="production-detector",
+        model_version="1.0.0",
+        requested_device=DeviceType.CPU,
+        cuda_device_index=0,
+        image_size=640,
+        backend_confidence_floor=0.001,
+        iou_threshold=0.7,
+        allowed_labels=("person",),
+        cuda_probe=lambda: False,
+    )
+
+    with pytest.raises(ModelIntegrityError, match="requires a configured SHA-256"):
+        detector.load()
+
+
 def test_detector_rejects_checksum_mismatch(
     tmp_path: Path,
 ) -> None:

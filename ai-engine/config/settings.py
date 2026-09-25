@@ -3,9 +3,9 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from string import hexdigits
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -182,6 +182,23 @@ class Settings(BaseSettings):
 
     production_model_enabled: bool = False
 
+    addon_enabled: bool = False
+    addon_event_v11_enabled: bool = False
+    addon_threat_model_enabled: bool = False
+    addon_threat_model_path: Path = Path("models/weapons.pt")
+    addon_threat_model_sha256: str | None = None
+    addon_plate_model_enabled: bool = False
+    addon_plate_model_path: Path = Path("models/license-plate.pt")
+    addon_plate_model_sha256: str | None = None
+    addon_pose_model_enabled: bool = False
+    addon_pose_model_path: Path = Path("models/pose.pt")
+    addon_pose_model_sha256: str | None = None
+    addon_plate_ocr_enabled: bool = True
+    addon_pose_confirmation_frames: int = Field(default=3, ge=1, le=60)
+    addon_pose_confirmation_expiry_seconds: float = Field(default=5.0, gt=0, le=300)
+    addon_pose_confidence_threshold: float = Field(default=0.75, ge=0, le=1)
+    addon_pose_minimum_iou: float = Field(default=0.3, ge=0, le=1)
+
     model_path: Path = Path("models/yolo26n.pt")
     model_name: str = Field(
         default="surveillance-yolo",
@@ -232,7 +249,12 @@ class Settings(BaseSettings):
 
     model_sha256: str | None = None
 
-    @field_validator("model_sha256")
+    @field_validator(
+        "model_sha256",
+        "addon_threat_model_sha256",
+        "addon_plate_model_sha256",
+        "addon_pose_model_sha256",
+    )
     @classmethod
     def validate_model_sha256(
         cls,
@@ -252,6 +274,42 @@ class Settings(BaseSettings):
             raise ValueError("model_sha256 must be a 64-character hexadecimal digest")
 
         return normalised
+
+    @model_validator(mode="after")
+    def require_checksum_for_production_model(self) -> Self:
+        if self.production_model_enabled and self.model_sha256 is None:
+            raise ValueError(
+                "AI_MODEL_SHA256 is required when AI_PRODUCTION_MODEL_ENABLED is true"
+            )
+
+        if (
+            self.addon_event_v11_enabled
+            or self.addon_threat_model_enabled
+            or self.addon_plate_model_enabled
+            or self.addon_pose_model_enabled
+        ) and not self.addon_enabled:
+            raise ValueError(
+                "AI_ADDON_ENABLED must be true when add-on models or "
+                "v1.1 events are enabled"
+            )
+
+        enabled_models = (
+            ("threat", self.addon_threat_model_enabled, self.addon_threat_model_sha256),
+            ("plate", self.addon_plate_model_enabled, self.addon_plate_model_sha256),
+            ("pose", self.addon_pose_model_enabled, self.addon_pose_model_sha256),
+        )
+        if any(enabled and digest is None for _, enabled, digest in enabled_models):
+            missing = [
+                capability
+                for capability, enabled, digest in enabled_models
+                if enabled and digest is None
+            ]
+            raise ValueError(
+                "SHA-256 digests are required for enabled add-on models: "
+                + ", ".join(missing)
+            )
+
+        return self
 
 
 @lru_cache

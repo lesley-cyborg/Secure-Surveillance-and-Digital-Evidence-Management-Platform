@@ -36,6 +36,7 @@ model = [
 [tool.hatch.build.targets.wheel]
 packages = [
     "api",
+    "addons",
     "config",
     "detection",
     "models",
@@ -62,6 +63,7 @@ ignore = []
 [tool.ruff.lint.isort]
 known-first-party = [
     "api",
+    "addons",
     "config",
     "detection",
     "models",
