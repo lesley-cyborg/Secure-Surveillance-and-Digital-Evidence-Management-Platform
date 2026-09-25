@@ -118,6 +118,15 @@ def create_payload(
     if include_unknown_field:
         payload["unexpected_field"] = "must-be-rejected"
 
+    if schema_version == "1.1":
+        payload["analysis"] = {
+            "threat_signals": [],
+            "weapon_count": 0,
+            "plates": [],
+            "poses": [],
+            "degraded_capabilities": ["plate_ocr"],
+        }
+
     return payload
 
 
@@ -297,6 +306,54 @@ async def test_valid_event_is_accepted() -> None:
         "event_id": str(event_id),
         "correlation_id": str(event_id),
     }
+
+
+async def test_v11_event_with_analysis_is_accepted() -> None:
+    event_id = uuid4()
+    payload = create_payload(event_id=event_id, schema_version="1.1")
+    body = encode_payload(payload)
+
+    async with create_client(create_settings()) as client:
+        response = await client.post(
+            ENDPOINT,
+            content=body,
+            headers=create_headers(body=body, correlation_id=event_id),
+        )
+
+    assert response.status_code == 202
+
+
+async def test_v11_rejects_unreadable_plate_placeholder() -> None:
+    event_id = uuid4()
+    payload = create_payload(event_id=event_id, schema_version="1.1")
+    payload["analysis"] = {
+        "threat_signals": [],
+        "weapon_count": 0,
+        "plates": [
+            {
+                "text": "unreadable",
+                "confidence": 0.0,
+                "bounding_box": {
+                    "x_min": 0.1,
+                    "y_min": 0.1,
+                    "x_max": 0.5,
+                    "y_max": 0.4,
+                },
+            }
+        ],
+        "poses": [],
+        "degraded_capabilities": [],
+    }
+    body = encode_payload(payload)
+
+    async with create_client(create_settings()) as client:
+        response = await client.post(
+            ENDPOINT,
+            content=body,
+            headers=create_headers(body=body, correlation_id=event_id),
+        )
+
+    assert response.status_code == 422
 
 
 async def test_unknown_payload_field_is_rejected() -> None:

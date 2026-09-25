@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
+import structlog
+
+from addons.pipeline import AnalysisPipeline
+from config.settings import Settings
 from detection.schemas import DetectionResult
 from streaming.detection_events import (
     StreamBoundingBox,
@@ -12,6 +18,8 @@ from streaming.event_sink import (
     StreamDetectionEventSink,
 )
 from streaming.worker import DetectionResultHandler
+
+logger = structlog.get_logger(__name__)
 
 
 def build_stream_detection_event(
@@ -54,6 +62,8 @@ def build_stream_detection_event(
 def create_stream_result_handler(
     *,
     sink: StreamDetectionEventSink,
+    settings: Settings | None = None,
+    addon_pipeline: AnalysisPipeline | None = None,
 ) -> DetectionResultHandler:
     """Create the worker callback that publishes events."""
 
@@ -71,6 +81,36 @@ def create_stream_result_handler(
             frame=frame,
             result=result,
         )
+        if (
+            settings is not None
+            and settings.addon_enabled
+            and addon_pipeline is not None
+        ):
+            analysis = await addon_pipeline.analyze(
+                frame.image,
+                detections=tuple(
+                    (detection.label, detection.confidence)
+                    for detection in result.detections
+                ),
+                camera_id=frame.camera_id,
+                sequence_number=frame.sequence_number,
+            )
+            logger.info(
+                "addon_analysis_completed",
+                camera_id=frame.camera_id,
+                sequence_number=frame.sequence_number,
+                threat_count=len(analysis.threat_signals),
+                plate_count=len(analysis.plates),
+                pose_count=len(analysis.poses),
+                confirmed_pose_count=sum(pose.confirmed for pose in analysis.poses),
+                degraded_capabilities=analysis.degraded_capabilities,
+            )
+            if settings.addon_event_v11_enabled:
+                event = replace(
+                    event,
+                    schema_version="1.1",
+                    analysis=analysis.model_dump(mode="json"),
+                )
 
         await sink.publish(event)
 

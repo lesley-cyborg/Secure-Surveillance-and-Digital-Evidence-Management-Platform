@@ -211,10 +211,13 @@ class DetectionEventIngestionService:
     def _contextual_metadata(
         event: DetectionEventIngestionRequest,
     ) -> dict[str, object]:
-        return {
+        metadata: dict[str, object] = {
             "camera_code": event.camera_id,
             "detection_count": event.detection_count,
             "frame": event.frame.model_dump(mode="json"),
             "model": event.model.model_dump(mode="json"),
             "inference": event.inference.model_dump(mode="json"),
         }
+        if event.analysis is not None:
+            metadata["analysis"] = event.analysis.model_dump(mode="json")
+        return metadata

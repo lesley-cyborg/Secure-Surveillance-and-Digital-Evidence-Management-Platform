@@ -66,6 +66,14 @@ See the detailed [architecture overview](docs/architecture.md).
 - Ultralytics detector adapter
 - Structured detection-event serialization and dispatch
 - Backend incident sink integration
+- Image-analysis API with optional OCR, face observations, and evidence-only threat signals
+- Production weight loading requires a configured SHA-256 digest; see [AI engine setup and integration](ai-engine/README.md)
+- Optional stream add-ons use camera/sequence-aware box matching for pose
+  observation confirmation, never synthetic person IDs. Add-on analysis is
+  opt-in and emitted through event schema `1.1`; schema `1.0` remains the
+  default. OCR placeholders are suppressed, and enabled model weights require
+  local paths plus configured SHA-256 digests. See
+  [AI engine setup and integration](ai-engine/README.md).
 - Unit and integration test coverage
 
 ### Backend platform

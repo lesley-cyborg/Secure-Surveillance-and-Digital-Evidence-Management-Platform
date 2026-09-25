@@ -97,6 +97,7 @@ def test_payload_contains_backend_contract() -> None:
 
     assert payload["inference"]["duration_ms"] == 8.5
     assert payload["inference"]["processed_at"].endswith("Z")
+    assert "analysis" not in payload
 
 
 def test_serialization_is_deterministic() -> None:
@@ -144,3 +145,22 @@ def test_serialized_event_excludes_sensitive_data() -> None:
     assert "password" not in serialized
     assert '"image"' not in serialized
     assert "image_bytes" not in serialized
+
+
+def test_v11_payload_adds_only_analysis_extension() -> None:
+    event = replace(
+        create_event(),
+        schema_version="1.1",
+        analysis={
+            "threat_signals": [],
+            "weapon_count": 0,
+            "plates": [],
+            "poses": [],
+            "degraded_capabilities": ["plate_ocr"],
+        },
+    )
+
+    payload = stream_detection_event_to_payload(event)
+
+    assert payload["schema_version"] == "1.1"
+    assert payload["analysis"]["degraded_capabilities"] == ["plate_ocr"]

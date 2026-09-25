@@ -6,6 +6,10 @@ from detection.detector import FrameArray
 from vision.schemas import FaceObservation, OCRText
 
 
+class OCRProviderError(RuntimeError):
+    """An OCR runtime failure that should not fail image analysis."""
+
+
 @runtime_checkable
 class OCRProvider(Protocol):
     @property

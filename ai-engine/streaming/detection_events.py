@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 
@@ -151,6 +152,8 @@ class StreamDetectionEvent:
     detections: tuple[StreamDetection, ...]
 
     inference_duration_ms: float
+    schema_version: Literal["1.0", "1.1"] = "1.0"
+    analysis: dict[str, object] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -186,6 +189,9 @@ class StreamDetectionEvent:
 
         if self.inference_duration_ms < 0:
             raise ValueError("inference_duration_ms cannot be negative")
+
+        if (self.schema_version == "1.1") != (self.analysis is not None):
+            raise ValueError("schema version 1.1 requires analysis data")
 
     @property
     def detection_count(self) -> int:

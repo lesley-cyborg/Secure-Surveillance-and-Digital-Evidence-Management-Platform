@@ -5,6 +5,7 @@ from typing import Protocol
 
 import cv2
 
+from addons.pipeline import AnalysisPipeline
 from api.composition.stream_results import (
     create_stream_result_handler,
 )
@@ -101,6 +102,7 @@ def build_stream_worker_factory(
     processor: StreamImageProcessor,
     settings: Settings,
     event_sink: StreamDetectionEventSink | None = None,
+    addon_pipeline: AnalysisPipeline | None = None,
 ) -> CallableStreamWorkerFactory:
     """Create the production camera-worker factory."""
 
@@ -115,6 +117,8 @@ def build_stream_worker_factory(
 
     result_handler = create_stream_result_handler(
         sink=resolved_event_sink,
+        settings=settings,
+        addon_pipeline=addon_pipeline,
     )
 
     reconnect_config = ReconnectPolicyConfig(
