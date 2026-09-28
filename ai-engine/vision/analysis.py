@@ -18,7 +18,19 @@ class VisionAnalyzer:
         ocr: OCRProvider | None = None,
         face_detector: FaceDetector | None = None,
         threat_labels: frozenset[str] = frozenset(
-            {"weapon", "firearm", "gun", "knife", "fire", "smoke", "violence"}
+            {
+                "weapon",
+                "firearm",
+                "gun",
+                "knife",
+                "sword",
+                "pistol",
+                "handgun",
+                "rifle",
+                "fire",
+                "smoke",
+                "violence",
+            }
         ),
     ) -> None:
         self.ocr = ocr
@@ -60,13 +72,17 @@ class VisionAnalyzer:
             ocr=ocr,
             faces=faces,
             threat_signals=signals,
+            plates=(),
+            poses=(),
+            weapon_count=0,
+            degraded_capabilities=(),
             ocr_model=ocr_model,
             face_model=(
                 VisionModel(
                     name=self.face_detector.model[0],
                     version=self.face_detector.model[1],
                 )
-            )
-            if self.face_detector is not None and self.face_detector.is_ready
-            else None,
+                if self.face_detector is not None and self.face_detector.is_ready
+                else None
+            ),
         )

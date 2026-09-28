@@ -14,6 +14,7 @@ from fastapi import (
     status,
 )
 
+from addons.pipeline import AnalysisPipeline
 from api.dependencies import (
     get_frame_processor,
     get_inference_gate,
@@ -21,7 +22,7 @@ from api.dependencies import (
     get_model_registry,
     get_settings_from_app,
 )
-from api.dependencies.core import get_vision_analyzer
+from api.dependencies.core import get_addon_pipeline, get_vision_analyzer
 from api.schemas import (
     ErrorResponse,
     HealthResponse,
@@ -67,6 +68,10 @@ async def analyze_image(
     file: Annotated[UploadFile, File(description="JPEG or PNG surveillance frame")],
     processor: Annotated[FrameProcessor, Depends(get_frame_processor)],
     analyzer: Annotated[VisionAnalyzer, Depends(get_vision_analyzer)],
+    addon_pipeline: Annotated[
+        AnalysisPipeline | None,
+        Depends(get_addon_pipeline),
+    ],
     settings: Annotated[Settings, Depends(get_settings_from_app)],
     confidence_threshold: Annotated[float, Form(ge=0, le=1)] = 0.5,
     supplied_correlation_id: Annotated[
@@ -95,12 +100,30 @@ async def analyze_image(
             correlation_id=correlation_id,
         )
         decoded = processor.decoder.decode_image(payload, media_type)
-        return await analyzer.analyze(
+        detections = tuple(
+            (detection.label, detection.confidence)
+            for detection in result.detections
+        )
+        vision = await analyzer.analyze(decoded.image, detections=detections)
+
+        if addon_pipeline is None:
+            return vision
+
+        addon = await addon_pipeline.analyze(
             decoded.image,
-            detections=tuple(
-                (detection.label, detection.confidence)
-                for detection in result.detections
-            ),
+            detections=detections,
+        )
+
+        merged_threats = tuple(vision.threat_signals) + tuple(addon.threat_signals)
+
+        return vision.model_copy(
+            update={
+                "threat_signals": merged_threats,
+                "plates": addon.plates,
+                "poses": addon.poses,
+                "weapon_count": addon.weapon_count,
+                "degraded_capabilities": addon.degraded_capabilities,
+            }
         )
     finally:
         await file.close()

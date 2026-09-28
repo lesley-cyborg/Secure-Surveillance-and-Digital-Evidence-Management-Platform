@@ -182,15 +182,15 @@ class Settings(BaseSettings):
 
     production_model_enabled: bool = False
 
-    addon_enabled: bool = False
-    addon_event_v11_enabled: bool = False
-    addon_threat_model_enabled: bool = False
+    addon_enabled: bool =  True
+    addon_event_v11_enabled: bool = True
+    addon_threat_model_enabled: bool = True
     addon_threat_model_path: Path = Path("models/weapons.pt")
     addon_threat_model_sha256: str | None = None
-    addon_plate_model_enabled: bool = False
+    addon_plate_model_enabled: bool = True
     addon_plate_model_path: Path = Path("models/license-plate.pt")
     addon_plate_model_sha256: str | None = None
-    addon_pose_model_enabled: bool = False
+    addon_pose_model_enabled: bool = True
     addon_pose_model_path: Path = Path("models/pose.pt")
     addon_pose_model_sha256: str | None = None
     addon_plate_ocr_enabled: bool = True

@@ -167,8 +167,10 @@ async def test_result_handler_publishes_event() -> None:
         StreamDetectionEventSink,
     )
 
+    settings = Settings()
     handler = create_stream_result_handler(
         sink=sink,
+        settings=settings,
     )
 
     frame = create_frame()
@@ -249,8 +251,10 @@ async def test_result_handler_passes_camera_sequence_to_addon_and_emits_v11() ->
 
 
 async def test_result_handler_rejects_unknown_result() -> None:
+    settings = Settings()
     handler = create_stream_result_handler(
         sink=NullStreamDetectionEventSink(),
+        settings=settings,
     )
 
     with pytest.raises(
@@ -264,8 +268,10 @@ async def test_result_handler_rejects_unknown_result() -> None:
 
 
 async def test_sink_failure_propagates() -> None:
+    settings = Settings()
     handler = create_stream_result_handler(
         sink=FailingEventSink(),
+        settings=settings,
     )
 
     with pytest.raises(

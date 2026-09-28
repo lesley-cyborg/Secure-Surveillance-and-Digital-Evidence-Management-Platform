@@ -71,10 +71,13 @@ class AnalysisPipeline:
                 degraded.add(name)
 
         signals = list(by_capability.get("threat", ()))
-        known_threats = {"weapon", "firearm", "gun", "pistol", "rifle", "knife"}
+        # Canonical names only (parser normalizes weapon-detector output)
+        known_threats = frozenset(  
+            {"knife", "sword", "rifle", "pistol", "firearm", "weapon"} 
+        )      
         signals.extend(
             ThreatSignal(
-                signal=label,
+                signal=label.casefold().replace("","_"),
                 confidence=confidence,
                 source="object_detection",
             )

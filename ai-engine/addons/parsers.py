@@ -5,6 +5,26 @@ from typing import Any, Protocol, cast
 
 from addons.schemas import BoundingBox, PlateCandidate, PoseObservation, ThreatSignal
 
+_WEAPON_ALIASES: dict[str, str] = {
+    "knife": "knife",
+    "sword": "sword",
+    "rifle": "rifle",
+    "pistol": "pistol",
+    "handgun": "pistol",
+    "gun": "pistol",
+    "firearm": "firearm",
+    "weapon": "weapon",   
+}
+
+_SKIP_LABELS: frozenset[str] = frozenset({"0", "person"})
+
+
+def normalize_threat_label(raw: str) -> str | None:
+    key = raw.strip().casefold().replace(" ", "_")
+    if key in _SKIP_LABELS or key == "":
+        return None
+    return _WEAPON_ALIASES.get(key)
+
 
 class _PredictionBox(Protocol):
     cls: Any
@@ -69,10 +89,15 @@ def parse_threat_predictions(results: object) -> tuple[ThreatSignal, ...]:
     result, boxes, width, height = _prediction_boxes(results)
     if result is None:
         return ()
+
     signals: list[ThreatSignal] = []
     for box in boxes:
         class_id = int(_scalar(box.cls[0]))
         label = str(result.names[class_id])
+        normalized = normalize_threat_label(label)
+        if normalized is None:
+            continue
+
         signals.append(
             ThreatSignal(
                 signal=label,

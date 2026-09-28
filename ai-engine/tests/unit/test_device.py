@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import importlib as stdlib_importlib
 from types import SimpleNamespace
 
 import pytest
 
-import detection.device as device_module
 from detection.device import is_cuda_available, select_device
 from detection.exceptions import (
     DeviceUnavailableError,
@@ -50,14 +50,17 @@ def test_explicit_cuda_fails_when_unavailable() -> None:
 def test_cuda_probe_detects_installed_runtime(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(
-        device_module.importlib,
-        "import_module",
-        lambda _: SimpleNamespace(
+    def fake_import(name: str) -> object:
+        if name != "torch":
+            return stdlib_importlib.import_module(name)
+        return SimpleNamespace(
             cuda=SimpleNamespace(is_available=lambda: True),
-        ),
+        )
+    monkeypatch.setattr(
+        stdlib_importlib,
+        "import_module",
+        fake_import
     )
-
     assert is_cuda_available() is True
 
 
@@ -67,12 +70,17 @@ def test_cuda_probe_degrades_when_runtime_check_fails(
     def unavailable() -> bool:
         raise RuntimeError("CUDA runtime is unavailable")
 
-    monkeypatch.setattr(
-        device_module.importlib,
-        "import_module",
-        lambda _: SimpleNamespace(
+    def fake_import(name: str) -> object:
+        if name != "torch":
+            return stdlib_importlib.import_module(name)
+        return SimpleNamespace(
             cuda=SimpleNamespace(is_available=unavailable),
-        ),
+        )
+
+    monkeypatch.setattr(
+        stdlib_importlib,
+        "import_module",
+        fake_import
     )
 
     assert is_cuda_available() is False
@@ -85,10 +93,12 @@ def test_cuda_probe_degrades_when_runtime_check_fails(
 def test_cuda_probe_degrades_when_runtime_import_fails(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def unavailable(_: str) -> object:
-        raise OSError("CUDA runtime libraries are unavailable")
+    def unavailable(name: str) -> object:
+        if name == "torch":
+            raise OSError("CUDA runtime libraries are unavailable")
+        return stdlib_importlib.import_module(name)
 
-    monkeypatch.setattr(device_module.importlib, "import_module", unavailable)
+    monkeypatch.setattr(stdlib_importlib, "import_module", unavailable)
 
     assert is_cuda_available() is False
     with pytest.raises(DeviceUnavailableError):

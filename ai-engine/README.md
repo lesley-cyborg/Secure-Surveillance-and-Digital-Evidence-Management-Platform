@@ -59,8 +59,7 @@ Ultralytics. Runtime settings reject an enabled production model without a
 digest, and the default production loader independently enforces the same
 integrity check. Tests and development can still inject a custom model loader
 without a real weights file or digest; this injection path is not used by the
-production detector factories. Add-on weights use the same local-file,
-checksum-before-load policy.
+production detector factory.
 
 Tesseract is an optional system executable used by `pytesseract`; installing
 the Python package alone does not install the executable. If it is unavailable,
@@ -78,9 +77,6 @@ pytest -q tests/unit
 pytest -q tests/integration/test_backend_event_delivery.py tests/integration/test_concurrent_streams.py
 ```
 
-Backend AI-ingestion contract tests are in
-`../backend/tests/integration/test_ai_ingestion_api.py` and
-`../backend/tests/integration/test_ai_ingestion_persistence.py`; run them from
-the backend directory. The real-RTSP tests additionally require the Docker test stack; see
+The real-RTSP tests additionally require the Docker test stack; see
 `scripts/run_rtsp_integration.ps1`. No real model weights or CUDA device are
 required for the unit or backend-event integration tests.
