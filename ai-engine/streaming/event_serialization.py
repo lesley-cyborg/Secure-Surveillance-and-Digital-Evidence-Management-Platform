@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import UTC, datetime
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 from streaming.detection_events import StreamDetectionEvent
 
@@ -52,6 +52,7 @@ class StreamDetectionEventPayload(TypedDict):
     detections: list[DetectionPayload]
     detection_count: int
     inference: InferencePayload
+    analysis: NotRequired[dict[str, object]]
 
 
 def _format_datetime(value: datetime) -> str:
@@ -85,8 +86,8 @@ def stream_detection_event_to_payload(
         for detection in event.detections
     ]
 
-    return {
-        "schema_version": EVENT_SCHEMA_VERSION,
+    payload: StreamDetectionEventPayload = {
+        "schema_version": event.schema_version,
         "event_type": EVENT_TYPE,
         "event_id": str(event.correlation_id),
         "camera_id": event.camera_id,
@@ -107,6 +108,9 @@ def stream_detection_event_to_payload(
             "processed_at": _format_datetime(event.processed_at),
         },
     }
+    if event.analysis is not None:
+        payload["analysis"] = event.analysis
+    return payload
 
 
 def serialize_stream_detection_event(

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from dataclasses import replace
 
+import structlog
+
+from addons.pipeline import AnalysisPipeline
+from config.settings import Settings
 from detection.schemas import DetectionResult
 from streaming.detection_events import (
     StreamBoundingBox,
