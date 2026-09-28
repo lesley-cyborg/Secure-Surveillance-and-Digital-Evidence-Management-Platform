@@ -311,6 +311,10 @@ class UltralyticsDetector:
             raise ModelLoadError("Production model file is empty")
 
         if self._expected_sha256 is None:
+            if self._model_loader is default_model_loader:
+                raise ModelIntegrityError(
+                    "Production model loading requires a configured SHA-256 digest"
+                )
             return
 
         actual_sha256 = self._calculate_sha256(self._model_path)

@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import structlog
+
 from detection.detector import FrameArray
+from vision.interfaces import OCRProviderError
 from vision.schemas import OCRText
+
+logger = structlog.get_logger(__name__)
 
 
 class TesseractOCR:
@@ -35,14 +40,28 @@ class TesseractOCR:
         return True
 
     def extract(self, frame: FrameArray) -> tuple[OCRText, ...]:
-        import pytesseract
-        from pytesseract import Output
+        try:
+            import pytesseract
+            from pytesseract import Output
+        except ImportError as exception:
+            raise OCRProviderError(
+                "Tesseract OCR dependency is unavailable"
+            ) from exception
 
-        data = pytesseract.image_to_data(
-            frame,
-            lang=self.language,
-            output_type=Output.DICT,
-        )
+        try:
+            data = pytesseract.image_to_data(
+                frame,
+                lang=self.language,
+                output_type=Output.DICT,
+            )
+        except (
+            OSError,
+            RuntimeError,
+            pytesseract.TesseractError,
+            pytesseract.TesseractNotFoundError,
+        ) as exception:
+            raise OCRProviderError("Tesseract OCR extraction failed") from exception
+
         height, width = frame.shape[:2]
         results: list[OCRText] = []
         for index, raw_text in enumerate(data["text"]):

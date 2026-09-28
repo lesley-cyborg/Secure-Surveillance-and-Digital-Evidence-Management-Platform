@@ -3,10 +3,14 @@ from __future__ import annotations
 import importlib
 from collections.abc import Callable
 
+import structlog
+
 from detection.exceptions import (
     DeviceUnavailableError,
 )
 from detection.schemas import DeviceType
+
+logger = structlog.get_logger(__name__)
 
 CudaAvailabilityProbe = Callable[[], bool]
 
@@ -22,6 +26,12 @@ def is_cuda_available() -> bool:
     try:
         torch = importlib.import_module("torch")
     except ImportError:
+        return False
+    except (OSError, RuntimeError) as exception:
+        logger.warning(
+            "cuda_runtime_import_failed",
+            error_type=type(exception).__name__,
+        )
         return False
 
     cuda = getattr(
@@ -39,7 +49,14 @@ def is_cuda_available() -> bool:
     if not callable(availability_check):
         return False
 
-    return bool(availability_check())
+    try:
+        return bool(availability_check())
+    except (OSError, RuntimeError) as exception:
+        logger.warning(
+            "cuda_availability_probe_failed",
+            error_type=type(exception).__name__,
+        )
+        return False
 
 
 def select_device(

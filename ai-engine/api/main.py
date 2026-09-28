@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -7,6 +8,7 @@ import structlog
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
+from addons.runtime import AddonRuntime, build_addon_runtime
 from api.composition.backend_sink import (
     build_backend_incident_sink,
 )
@@ -51,6 +53,7 @@ def create_app(
     stream_detection_sink: StreamDetectionEventSink | None = None,
     stream_dead_letter_sink: StreamDetectionEventSink | None = None,
     vision_analyzer: VisionAnalyzer | None = None,
+    addon_runtime: AddonRuntime | None = None,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
     resolved_registry = registry or ModelRegistry()
@@ -83,6 +86,11 @@ def create_app(
         ocr=TesseractOCR(),
         face_detector=OpenCVFaceDetector(),
     )
+    resolved_addon_runtime = (
+        addon_runtime
+        if addon_runtime is not None
+        else build_addon_runtime(resolved_settings)
+    )
 
     resolved_stream_detection_sink = (
         stream_detection_sink
@@ -103,6 +111,7 @@ def create_app(
             processor=processor,
             settings=resolved_settings,
             event_sink=(stream_detection_dispatcher),
+            addon_pipeline=resolved_addon_runtime.pipeline,
         )
     )
 
@@ -118,6 +127,8 @@ def create_app(
 
         try:
             await resolved_lifecycle.startup()
+            if resolved_settings.addon_enabled:
+                await asyncio.to_thread(resolved_addon_runtime.startup)
             await stream_detection_dispatcher.start()
 
             logger.info(
@@ -148,13 +159,16 @@ def create_app(
                     await stream_detection_dispatcher.shutdown()
                 finally:
                     try:
-                        if isinstance(
-                            resolved_stream_detection_sink,
-                            ManagedStreamDetectionEventSink,
-                        ):
-                            await resolved_stream_detection_sink.shutdown()
+                        await asyncio.to_thread(resolved_addon_runtime.shutdown)
                     finally:
-                        await resolved_lifecycle.shutdown()
+                        try:
+                            if isinstance(
+                                resolved_stream_detection_sink,
+                                ManagedStreamDetectionEventSink,
+                            ):
+                                await resolved_stream_detection_sink.shutdown()
+                        finally:
+                            await resolved_lifecycle.shutdown()
 
             logger.info(
                 "application_shutdown_finished",
@@ -180,6 +194,7 @@ def create_app(
     application.state.model_lifecycle = resolved_lifecycle
     application.state.inference_gate = inference_gate
     application.state.vision_analyzer = resolved_vision_analyzer
+    application.state.addon_runtime = resolved_addon_runtime
 
     application.state.stream_manager = stream_manager
     application.state.stream_worker_factory = resolved_stream_worker_factory

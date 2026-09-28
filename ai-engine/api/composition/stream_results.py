@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from detection.schemas import DetectionResult
 from streaming.detection_events import (
     StreamBoundingBox,
@@ -8,10 +10,12 @@ from streaming.detection_events import (
     StreamModelIdentity,
 )
 from streaming.domain import StreamFrame
-from streaming.event_sink import (
-    StreamDetectionEventSink,
-)
+from streaming.event_sink import StreamDetectionEventSink
 from streaming.worker import DetectionResultHandler
+
+if TYPE_CHECKING:
+    from addons.pipeline import AnalysisPipeline
+    from config.settings import Settings
 
 
 def build_stream_detection_event(
@@ -20,11 +24,10 @@ def build_stream_detection_event(
     result: DetectionResult,
 ) -> StreamDetectionEvent:
     """Combine camera context with a detection result."""
-
     return StreamDetectionEvent(
         correlation_id=result.correlation_id,
         camera_id=frame.camera_id,
-        frame_sequence_number=(frame.sequence_number),
+        frame_sequence_number=frame.sequence_number,
         captured_at=frame.captured_at,
         received_at=frame.received_at,
         processed_at=result.processed_at,
@@ -39,39 +42,43 @@ def build_stream_detection_event(
                 label=detection.label,
                 confidence=detection.confidence,
                 bounding_box=StreamBoundingBox(
-                    x_min=(detection.bounding_box.x_min),
-                    y_min=(detection.bounding_box.y_min),
-                    x_max=(detection.bounding_box.x_max),
-                    y_max=(detection.bounding_box.y_max),
+                    x_min=detection.bounding_box.x_min,
+                    y_min=detection.bounding_box.y_min,
+                    x_max=detection.bounding_box.x_max,
+                    y_max=detection.bounding_box.y_max,
                 ),
             )
             for detection in result.detections
         ),
-        inference_duration_ms=(result.inference_duration_ms),
+        inference_duration_ms=result.inference_duration_ms,
     )
 
 
 def create_stream_result_handler(
     *,
     sink: StreamDetectionEventSink,
+    settings: Settings,
+    addon_pipeline: AnalysisPipeline | None = None,
 ) -> DetectionResultHandler:
-    """Create the worker callback that publishes events."""
+    """Create the worker callback that publishes detection events.
+
+    addon_pipeline is accepted for composition compatibility. Wire enrichment
+    here only when add-on models are enabled and loaded.
+    """
+    del settings  # reserved for future flags (e.g. enable stream enrichment)
 
     async def handle_result(
         frame: StreamFrame,
         result: object,
     ) -> None:
-        if not isinstance(
-            result,
-            DetectionResult,
-        ):
+        if not isinstance(result, DetectionResult):
             raise TypeError("Stream processor returned an unsupported result type")
 
-        event = build_stream_detection_event(
-            frame=frame,
-            result=result,
-        )
+        # Optional later:
+        # if addon_pipeline is not None:
+        #     result = await addon_pipeline.enrich(frame, result)
 
+        event = build_stream_detection_event(frame=frame, result=result)
         await sink.publish(event)
 
     return handle_result

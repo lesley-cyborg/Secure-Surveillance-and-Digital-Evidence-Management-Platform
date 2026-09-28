@@ -4,6 +4,8 @@ from typing import cast
 
 from fastapi import Request
 
+from addons.pipeline import AnalysisPipeline
+from addons.runtime import AddonRuntime
 from config.settings import Settings
 from detection.frame_processor import (
     FrameProcessor,
@@ -69,3 +71,15 @@ def get_vision_analyzer(
     request: Request,
 ) -> VisionAnalyzer:
     return cast(VisionAnalyzer, request.app.state.vision_analyzer)
+
+
+def get_addon_pipeline(
+    request: Request,
+) -> AnalysisPipeline | None:
+    runtime = cast(
+        AddonRuntime | None,
+        getattr(request.app.state, "addon_runtime", None),
+    )
+    if runtime is None: 
+        return None
+    return runtime.pipeline
