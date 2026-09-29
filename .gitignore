@@ -115,3 +115,9 @@ coverage/
 
 docker-compose.override.yml
 ai-engine/mypy-traceback.txt
+
+ai-engine/weapon-*.json
+ai-engine/out1.json
+
+ai-engine/weapon-*.json
+ai-engine/out1.json
