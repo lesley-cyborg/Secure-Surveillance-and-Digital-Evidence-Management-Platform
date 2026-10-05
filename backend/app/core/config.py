@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     database_pool_timeout: int = Field(default=30, ge=1, le=300)
     database_echo: bool = False
 
+    # Camera Stream Encryption
+    # Camera stream URL encryption (Fernet key)
+    camera_stream_encryption_key: SecretStr = Field(
+        ...,
+        description="Fernet key for encrypting camera stream URLs at rest",
+    )
+
     # Redis
     redis_url: str
     redis_socket_timeout: float = Field(default=3.0, gt=0, le=60)

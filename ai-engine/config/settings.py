@@ -36,6 +36,15 @@ class Settings(BaseSettings):
         repr=False,
     )
 
+    # ADD THIS: The root URL of your FastAPI backend
+    backend_base_url: str = Field(
+        default="http://127.0.0.1:8000",
+        description="Root URL of the main surveillance backend API",
+    )
+
+    backend_incident_endpoint_url: str | None = None
+
+
     backend_incident_connect_timeout_seconds: float = Field(
         default=5.0,
         gt=0,

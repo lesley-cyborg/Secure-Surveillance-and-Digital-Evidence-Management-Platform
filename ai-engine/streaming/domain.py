@@ -49,7 +49,7 @@ class CameraStreamConfig:
     enabled: bool = True
     transport: StreamTransport = StreamTransport.TCP
 
-    target_fps: float = 1.0
+    target_fps: float = 15.0
     confidence_threshold: float = 0.35
     queue_capacity: int = 1
 

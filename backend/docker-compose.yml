@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U surveillance -d surveillance"]
+      test: ["CMD-SHELL", "pg_is_ready -U surveillance -d surveillance"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -71,6 +71,7 @@ services:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
       MINIO_BUCKET: evidence
+      CAMERA_STREAM_ENCRYPTION_KEY: zqkB-GMg0t0RZbQd66NH_c_5T_CrxN0uCtdGrfPYFwo=
       
       # THIS WAS THE MISSING PIECE causing the Pydantic crash:
       JWT_SECRET_KEY: "nfLtlq5ZbcLBwJYajwbReNwDRWcW6kChjkMaCBiNyLu3Us3J6MpgANXjLeN0eMY3fWDFKuIBV44L2DUg"

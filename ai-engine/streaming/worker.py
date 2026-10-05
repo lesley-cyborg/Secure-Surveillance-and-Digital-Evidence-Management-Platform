@@ -6,6 +6,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
+import time
 import structlog
 
 from streaming.domain import (
@@ -34,6 +35,8 @@ from streaming.reconnect_policy import (
     ReconnectPolicySnapshot,
 )
 from streaming.source import StreamSource
+
+from integrations.backend.heartbeat_client import HeartbeatClient
 
 logger = structlog.get_logger(__name__)
 
@@ -89,6 +92,7 @@ class ContinuousDetectionWorker:
         reconnect_policy: ReconnectPolicy,
         process_frame: FrameProcessingFunction,
         result_handler: DetectionResultHandler | None = None,
+        heartbeat_client: HeartbeatClient | None = None,
     ) -> None:
         if source.config.camera_id != config.camera_id:
             raise ValueError("source camera_id does not match worker configuration")
@@ -106,6 +110,7 @@ class ContinuousDetectionWorker:
         self._reconnect_policy = reconnect_policy
         self._process_frame = process_frame
         self._result_handler = result_handler
+        self._heartbeat_client = heartbeat_client
 
         self._task: asyncio.Task[None] | None = None
         self._lifecycle_lock = asyncio.Lock()
@@ -124,6 +129,10 @@ class ContinuousDetectionWorker:
         self._frames_processed = 0
         self._detection_failures = 0
         self._reconnect_attempts = 0
+        
+        # Heartbeat tracking
+        self._last_heartbeat_at: datetime | None = None
+        self._heartbeat_interval_seconds = 30  # Send heartbeat every 30 seconds
 
     @property
     def config(self) -> CameraStreamConfig:
@@ -229,6 +238,15 @@ class ContinuousDetectionWorker:
             self._disposed = True
 
         await self._frame_queue.close(discard_pending=True)
+        
+        # Send final OFFLINE heartbeat and close client
+        if self._heartbeat_client:
+            await asyncio.to_thread(
+                self._heartbeat_client.send, 
+                "OFFLINE", 
+                "Worker disposed"
+            )
+            await asyncio.to_thread(self._heartbeat_client.close)
 
         logger.info(
             "camera_worker_disposed",
@@ -392,6 +410,9 @@ class ContinuousDetectionWorker:
 
                     await self._record_frame_received(frame)
 
+                    # Send periodic heartbeat while streaming
+                    await self._send_periodic_heartbeat()
+
                     if not self._sampler.should_sample():
                         continue
 
@@ -459,6 +480,14 @@ class ContinuousDetectionWorker:
         self,
     ) -> ReconnectDecision:
         await self._set_state(StreamState.RECONNECTING)
+        
+        # Send DEGRADED heartbeat during reconnect
+        if self._heartbeat_client:
+            await asyncio.to_thread(
+                self._heartbeat_client.send,
+                "DEGRADED",
+                "Stream disconnected, attempting reconnect"
+            )
 
         decision = await self._reconnect_policy.wait()
 
@@ -496,6 +525,14 @@ class ContinuousDetectionWorker:
             self._state = StreamState.CONNECTED
             self._connected_at = connected_at
             self._last_error = None
+            
+        # Send ONLINE heartbeat when connected
+        if self._heartbeat_client:
+            await asyncio.to_thread(
+                self._heartbeat_client.send,
+                "ONLINE",
+                "Stream connected and receiving frames"
+            )
 
     async def _record_frame_received(
         self,
@@ -534,6 +571,14 @@ class ContinuousDetectionWorker:
     ) -> None:
         async with self._metrics_lock:
             self._last_error = str(exception)
+            
+        # Send DEGRADED heartbeat on error
+        if self._heartbeat_client:
+            await asyncio.to_thread(
+                self._heartbeat_client.send,
+                "DEGRADED",
+                f"Stream error: {str(exception)}"
+            )
 
     async def _record_terminal_failure(
         self,
@@ -542,3 +587,38 @@ class ContinuousDetectionWorker:
         async with self._metrics_lock:
             self._state = StreamState.FAILED
             self._last_error = str(exception)
+            
+        # Send OFFLINE heartbeat on terminal failure
+        if self._heartbeat_client:
+            await asyncio.to_thread(
+                self._heartbeat_client.send,
+                "OFFLINE",
+                f"Terminal failure: {str(exception)}"
+            )
+            
+    async def _send_periodic_heartbeat(self) -> None:
+        """Send heartbeat every N seconds while streaming."""
+        if not self._heartbeat_client:
+            return
+            
+        now = datetime.now(UTC)
+        
+        async with self._metrics_lock:
+            if self._last_heartbeat_at is None:
+                # First heartbeat after connection
+                self._last_heartbeat_at = now
+                return
+                
+            elapsed = (now - self._last_heartbeat_at).total_seconds()
+            if elapsed >= self._heartbeat_interval_seconds:
+                self._last_heartbeat_at = now
+                should_send = True
+            else:
+                should_send = False
+        
+        if should_send:
+            await asyncio.to_thread(
+                self._heartbeat_client.send,
+                "ONLINE",
+                f"Streaming normally (processed {self._frames_processed} frames)"
+            )
