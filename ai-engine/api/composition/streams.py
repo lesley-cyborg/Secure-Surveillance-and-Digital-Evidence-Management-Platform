@@ -11,6 +11,7 @@ from api.composition.stream_results import (
 )
 from config.settings import Settings
 from detection.schemas import DetectionResult, MediaType
+from integrations.backend.heartbeat_client import HeartbeatClient  # <-- ADDED IMPORT
 from streaming.domain import (
     CameraStreamConfig,
     FrameArray,
@@ -132,6 +133,21 @@ def build_stream_worker_factory(
     def build_worker(
         config: CameraStreamConfig,
     ) -> ContinuousDetectionWorker:
+        
+        # --- HEARTBEAT INJECTION START ---
+        # Extract the token safely (it's a SecretStr in your settings)
+        service_token = (
+            settings.backend_service_token.get_secret_value() 
+            if settings.backend_service_token else ""
+        )
+        
+        heartbeat_client = HeartbeatClient(
+            camera_id=config.camera_id,
+            backend_url=settings.backend_base_url,
+            service_token=service_token,
+        )
+        # --- HEARTBEAT INJECTION END ---
+
         return ContinuousDetectionWorker(
             config=config,
             source=OpenCvRtspSource(
@@ -148,6 +164,7 @@ def build_stream_worker_factory(
             ),
             process_frame=process_frame,
             result_handler=result_handler,
+            heartbeat_client=heartbeat_client,  # <-- INJECTED HERE
         )
 
     return CallableStreamWorkerFactory(
