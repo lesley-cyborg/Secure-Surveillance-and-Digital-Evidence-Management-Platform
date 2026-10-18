@@ -2,8 +2,9 @@ import { apiRequest } from "@/lib/api";
 import type { CreateUserRequest } from "@/types/user";
 
 export async function listUsers() {
-  return apiRequest<unknown>("/api/v1/users");
-  // refine type once you see Swagger: { items: User[] } vs User[]
+  return apiRequest<{ items: Array<{ id: string; email: string; username?: string }> }>(
+    "/api/v1/users",
+  );
 }
 
 export async function getUser(userId: string) {

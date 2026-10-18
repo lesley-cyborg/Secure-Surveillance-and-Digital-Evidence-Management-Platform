@@ -54,14 +54,24 @@ export function TopBar() {
     getServerUserSnapshot,
   );
   const [now, setNow] = useState<string | null>(null);
+    
+  function formatClock(d = new Date()) {
+    return d.toLocaleTimeString("en-GB", {
+      timeZone: "Africa/Gaborone",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+  }  
 
   useEffect(() => {
-    const format = () => new Date().toISOString().slice(11, 19);
+    //const format = () => new Date().toISOString().slice(11, 19);
     const id = window.setInterval(() => {
-      setNow(format());
+      setNow(formatClock());
     }, 1000);
     const raf = window.requestAnimationFrame(() => {
-      setNow(format());
+      setNow(formatClock());
     });
     return () => {
       window.clearInterval(id);
@@ -82,7 +92,7 @@ export function TopBar() {
         Secure Surveillance Platform
       </h1>
       <div className="flex items-center gap-3 text-xs text-zinc-400">
-        <span className="font-mono tabular-nums">{now ?? "--:--:--"} UTC</span>
+        <span className="font-mono tabular-nums">{now ?? "--:--:--"} CAT</span>
         <span className="max-w-[10rem] truncate rounded-full border border-zinc-700 px-2 py-0.5 text-zinc-300">
           {displayName(user)}
         </span>

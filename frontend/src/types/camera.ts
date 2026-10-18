@@ -1,4 +1,4 @@
-export type CameraStatus = "ONLINE" | "OFFLINE" | "DEGRADED" | "DISABLED";
+export type CameraStatus = "ONLINE" | "OFFLINE" | "DEGRADED" | "DISABLED" | string;
 
 export type Camera = {
   id: string;
@@ -13,6 +13,19 @@ export type Camera = {
   lastSeenAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
+};
+
+export type CameraCreateInput = {
+  siteId: string;
+  name: string;
+  cameraCode: string;
+  ipAddress: string;
+  protocol: "RTSP" | "ONVIF" | "HTTPS";
+  streamUrl: string;
+  credentialsSecretRef: string;
+  locationDescription?: string | null;
+  status?: CameraStatus;
+  isActive?: boolean;
 };
 
 export type CameraListResponse = {

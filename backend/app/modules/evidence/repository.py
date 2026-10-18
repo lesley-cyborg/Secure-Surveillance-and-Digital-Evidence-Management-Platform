@@ -207,3 +207,47 @@ class EvidenceRepository:
         result = await self.session.execute(statement)
 
         return result.scalar_one_or_none()
+
+    async def list_evidence(
+        self,
+        *,
+        incident_id: UUID | None = None,
+        status_filter: EvidenceStatus | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[Evidence]:
+        statement = select(Evidence).order_by(Evidence.ingested_at.desc())
+
+        if incident_id is not None:
+            statement = statement.where(Evidence.incident_id == incident_id)
+
+        if status_filter is not None:
+            statement = statement.where(Evidence.status == status_filter)
+
+        statement = statement.limit(limit).offset(offset)
+
+        result = await self.session.execute(statement)
+        return list(result.scalars().all())
+
+
+    async def count_evidence(
+        self,
+        *,
+        incident_id: UUID | None = None,
+        status_filter: EvidenceStatus | None = None,
+    ) -> int:
+        from sqlalchemy import func
+
+        statement = select(func.count()).select_from(Evidence)
+
+        if incident_id is not None:
+            statement = statement.where(Evidence.incident_id == incident_id)
+
+        if status_filter is not None:
+            statement = statement.where(Evidence.status == status_filter)
+
+        result = await self.session.execute(statement)
+        return int(result.scalar_one())
+
+
+
