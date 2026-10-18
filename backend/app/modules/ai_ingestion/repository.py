@@ -24,6 +24,11 @@ class DetectionEventRepository:
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+    
+    async def get_camera_by_id(self, camera_id: UUID) -> Camera | None:
+        statement = select(Camera).where(Camera.id == camera_id)
+        result = await self.session.execute(statement)
+        return result.scalar_one_or_none()
 
     async def get_camera_by_code(
         self,

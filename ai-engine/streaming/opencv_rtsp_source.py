@@ -42,9 +42,9 @@ class VideoCaptureLike(Protocol):
 
     def open(
         self,
-        filename: str,
-        api_preference: int,
-        params: Sequence[int],
+        filename: str | int,
+        api_preference: int = 0,
+        params: Sequence[int] | None = None,
     ) -> bool:
         """Open a video source."""
 
@@ -86,7 +86,7 @@ def _create_opencv_capture() -> VideoCaptureLike:
 
 
 class OpenCvRtspSource:
-    """OpenCV-backed RTSP camera source.
+    """OpenCV-backed camera source (supports RTSP and local webcams).
 
     Each instance manages one VideoCapture object. Operations are
     serialised because OpenCV capture objects are not shared between
@@ -147,15 +147,21 @@ class OpenCvRtspSource:
             self._release_current_capture()
 
             capture = self._capture_factory()
-            parameters = self._build_open_parameters()
 
             try:
-                with self._temporary_ffmpeg_options():
-                    opened = capture.open(
-                        self._config.source_uri,
-                        self._backend_api,
-                        parameters,
-                    )
+                # --- WEBCAM FALLBACK ---
+                # If source_uri is "0" or "webcam", bypass RTSP/FFmpeg and open local camera
+                if str(self._config.source_uri).lower() in ("0", "webcam"):
+                    opened = capture.open(0)
+                else:
+                    parameters = self._build_open_parameters()
+                    with self._temporary_ffmpeg_options():
+                        opened = capture.open(
+                            self._config.source_uri,
+                            self._backend_api,
+                            parameters,
+                        )
+                # -----------------------
 
                 if not opened or not capture.isOpened():
                     raise StreamOpenError(

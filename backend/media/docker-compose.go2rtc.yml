@@ -1,0 +1,13 @@
+services:
+  go2rtc:
+    image: alexxit/go2rtc:latest
+    container_name: ssp-go2rtc
+    restart: unless-stopped
+    ports:
+      - "1984:1984"
+      - "8554:8554"
+    volumes:
+      - ./go2rtc.yaml:/config/go2rtc.yaml:ro
+    # Camera is on the host hotspot — often works if the host can ping the cam
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

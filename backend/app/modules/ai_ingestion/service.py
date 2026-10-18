@@ -158,12 +158,18 @@ class DetectionEventIngestionService:
             incident_id=existing.incident_id,
         )
 
-    async def _resolve_camera(self, camera_code: str) -> Camera:
-        camera = await self.repository.get_camera_by_code(camera_code)
+    async def _resolve_camera(self, camera_ref: str) -> Camera:
+        camera = await self.repository.get_camera_by_code(camera_ref)
         if camera is None:
-            raise CameraNotFoundError(camera_code)
+            from uuid import UUID
+            try:
+                camera = await self.repository.get_camera_by_id(UUID(camera_ref))
+            except ValueError:
+                camera = None
+        if camera is None:
+            raise CameraNotFoundError(camera_ref)
         if not camera.is_active:
-            raise CameraInactiveError(camera_code)
+            raise CameraInactiveError(camera_ref)
         return camera
 
     async def _resolve_model(

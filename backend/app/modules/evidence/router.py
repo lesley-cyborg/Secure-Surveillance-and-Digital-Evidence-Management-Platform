@@ -4,6 +4,8 @@ from typing import Annotated, Literal
 from urllib.parse import quote
 from uuid import UUID, uuid4
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from fastapi import (
     APIRouter,
     Body,
@@ -19,6 +21,7 @@ from fastapi import (
 from app.db.models.enums import (
     TransferStatus,
     VerificationStatus,
+    EvidenceStatus,
 )
 from app.modules.evidence.content_access import (
     EvidenceContentAccessCommand,
@@ -28,6 +31,11 @@ from app.modules.evidence.dependencies import (
     EvidenceTransferDecisionServiceAccess,
     EvidenceTransferInitiationServiceAccess,
     EvidenceVerificationHTTPServiceAccess,
+    DatabaseSession,
+)
+from app.modules.evidence.http_schemas import(
+    EvidenceListResponse,
+    EvidenceResponse,
 )
 from app.modules.evidence.errors import (
     EvidenceRetrievalHashMismatchError,
@@ -35,6 +43,7 @@ from app.modules.evidence.errors import (
     EvidenceRetrievalUnavailableError,
     EvidenceVerificationReferenceError,
 )
+from app.modules.evidence.repository import EvidenceRepository
 from app.modules.evidence.transfer_decision_http import (
     TransferDecisionRequest,
     build_transfer_decision_command,
@@ -199,20 +208,72 @@ async def _decide_evidence_transfer(
 
 
 @router.get(
-    "/{evidence_id}",
-    name="get_evidence",
+    "",
+    response_model=EvidenceListResponse,
+    response_model_by_alias=True,
+    summary="List evidence",
+    name="list_evidence",
 )
-async def get_evidence(
-    evidence_id: UUID,
+async def list_evidence(
+    session: DatabaseSession,
     _: Annotated[
         AuthorizationContext,
         Depends(require_permission("evidence.read")),
     ],
-) -> dict[str, str]:
-    return {
-        "evidenceId": str(evidence_id),
-    }
+    incident_id: Annotated[
+        UUID | None,
+        Query(alias="incidentId"),
+    ] = None,
+    status_filter: Annotated[
+        EvidenceStatus | None,
+        Query(alias="status"),
+    ] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> EvidenceListResponse:
+    repo = EvidenceRepository(session)
+    rows = await repo.list_evidence(
+        incident_id=incident_id,
+        status_filter=status_filter,
+        limit=limit,
+        offset=offset,
+    )
+    total = await repo.count_evidence(
+        incident_id=incident_id,
+        status_filter=status_filter,
+    )
+    return EvidenceListResponse(
+        items=[EvidenceResponse.from_model(r) for r in rows],
+        total=total,
+    )
 
+
+@router.get(
+    "/{evidence_id}",
+    response_model=EvidenceResponse,
+    response_model_by_alias=True,
+    summary="Get evidence",
+    name="get_evidence",
+)
+async def get_evidence(
+    evidence_id: UUID,
+    session: DatabaseSession,
+    _: Annotated[
+        AuthorizationContext,
+        Depends(require_permission("evidence.read")),
+    ],
+) -> EvidenceResponse:
+    repo = EvidenceRepository(session)
+    row = await repo.get_by_id(evidence_id)
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "EVIDENCE_NOT_FOUND",
+                "message": "The requested evidence was not found.",
+            },
+        )
+    return EvidenceResponse.from_model(row)
 
 @router.get(
     "/{evidence_id}/content",

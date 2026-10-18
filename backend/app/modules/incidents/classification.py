@@ -76,6 +76,22 @@ _DEFAULT_RULES: tuple[
     IncidentClassificationRule,
     ...,
 ] = (
+    # --- ADDED FOR TESTING THE PIPELINE ---
+    IncidentClassificationRule(
+        aliases=frozenset(
+            {
+                "person",
+                "human",
+                "individual",
+            }
+        ),
+        minimum_confidence=Decimal("0.5000"),
+        incident_type="PERSON_DETECTED",
+        severity=Severity.LOW,
+        priority=Priority.LOW,
+        title="Person detected in monitored area",
+    ),
+    # --------------------------------------
     IncidentClassificationRule(
         aliases=frozenset(
             {

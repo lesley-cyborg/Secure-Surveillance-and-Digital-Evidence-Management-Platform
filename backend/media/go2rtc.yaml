@@ -1,0 +1,22 @@
+# Lab only — RTSP stays on the server, never in the browser
+streams:
+  # Name used by the UI (map your camera UUID → this name later if you want)
+  cam_v380:
+#    - ffmpeg:rtsp://192.168.137.68:554/live/ch00_1#video=copy
+    - rtsp://192.168.137.68:554/live/ch00_1
+
+# If the above fails to open, try the plain RTSP line instead:
+#  cam_v380:
+#    - rtsp://192.168.137.68:554/live/ch00_1
+
+api:
+  listen: ":1984"
+  # Lab: allow the Next.js origin to embed / call the API
+  origin: "*"
+
+rtsp:
+  listen: ":8554"
+
+webrtc:
+  # Empty candidates = go2rtc picks defaults (OK for same-machine lab)
+  candidates: []
