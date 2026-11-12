@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from app.db.models.enums import (
     AuditOutcome,
@@ -208,22 +209,42 @@ class EvidenceTransferInitiationService:
                     "Transfer recipient is already the current custodian."
                 )
 
+            # Check for pending transfer, but allow new ones if the pending has expired
             pending = await self.transfers.get_pending_for_evidence_for_update(
                 evidence_id=evidence.id
             )
 
-            if pending is not None:
-                raise EvidenceTransferStateError("Evidence already has a pending custody transfer.")
+            now = datetime.now(UTC)
 
-            transfer = await self.transfers.create(
-                evidence_id=evidence.id,
-                from_user_id=(current_custodian_id),
-                to_user_id=(command.to_user_id),
-                initiated_by_user_id=(command.initiated_by_user_id),
-                idempotency_key=(command.idempotency_key),
-                purpose=(command.purpose.strip()),
-                expires_at=(command.expires_at),
-            )
+            if pending is not None:
+                # If the pending transfer hasn't expired yet, block the new transfer
+                if pending.expires_at > now:
+                    raise EvidenceTransferStateError(
+                        f"Evidence already has an active pending custody transfer "
+                        f"(expires at {pending.expires_at.isoformat()}). "
+                        f"Wait for it to be decided or expire before initiating a new transfer."
+                    )
+                # If it has expired, we can proceed with a new transfer
+                # The old expired transfer will remain in history for audit purposes
+
+            try:
+                transfer = await self.transfers.create(
+                    evidence_id=evidence.id,
+                    from_user_id=(current_custodian_id),
+                    to_user_id=(command.to_user_id),
+                    initiated_by_user_id=(command.initiated_by_user_id),
+                    idempotency_key=(command.idempotency_key),
+                    purpose=(command.purpose.strip()),
+                    expires_at=(command.expires_at),
+                )
+            except IntegrityError as e:
+                # Catch the unique constraint violation for pending transfers
+                if "uq_evidence_transfers_one_pending" in str(e.orig) or "uq_evidence_transfers" in str(e.orig):
+                    raise EvidenceTransferStateError(
+                        "Evidence already has a pending custody transfer. "
+                        "The current transfer must be accepted, rejected, or cancelled before initiating a new one."
+                    )
+                raise  # Re-raise if it's a different IntegrityError
 
             previous = await self.custody.get_latest_for_update(evidence_id=evidence.id)
 

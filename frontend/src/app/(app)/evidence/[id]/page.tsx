@@ -4,11 +4,14 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Download, ShieldCheck, Loader2 } from "lucide-react";
-import {
-  downloadBlob,
-  fetchEvidenceContent,
-  getEvidence,
+import { 
+  downloadBlob, 
+  fetchEvidenceContent, 
+  getEvidence, 
   verifyEvidence,
+  getCustodyEvents,       
+  acceptTransfer,         
+  rejectTransfer          
 } from "@/features/evidence/api";
 import {
   evidenceStatusClass,
@@ -19,12 +22,14 @@ import {
   canDownloadEvidence,
   canVerifyEvidence,
 } from "@/lib/permissions";
+import { getStoredUser } from "@/lib/auth"; 
 import type { Evidence, EvidenceVerification } from "@/types/evidence";
 import { CustodyPanel } from "@/features/custody/CustodyPanel";
 
 export default function EvidenceDetailPage() {
   const params = useParams();
   const id = String(params.id ?? "");
+  const currentUser = getStoredUser(); // 👈 GET CURRENT USER
 
   const [evidence, setEvidence] = useState<Evidence | null>(null);
   const [verification, setVerification] = useState<EvidenceVerification | null>(
@@ -35,6 +40,9 @@ export default function EvidenceDetailPage() {
   const [verifying, setVerifying] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
+
+  const [pendingTransfer, setPendingTransfer] = useState<any>(null);
+  const [transferActionLoading, setTransferActionLoading] = useState(false);
 
   const showDownload = canDownloadEvidence();
   const showVerify = canVerifyEvidence();
@@ -56,6 +64,32 @@ export default function EvidenceDetailPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    async function checkPendingTransfer() {
+      try {
+        const data = await getCustodyEvents(id);
+        const initiatedEvents = data.items.filter((e: any) => e.eventType === "TRANSFER_INITIATED");
+        if (initiatedEvents.length > 0) {
+          const latest = initiatedEvents[initiatedEvents.length - 1];
+          
+          // 👇 ONLY SET PENDING TRANSFER IF CURRENT USER IS THE RECIPIENT
+          if (currentUser?.id && latest.toUserId === currentUser.id) {
+            setPendingTransfer(latest);
+          } else {
+            setPendingTransfer(null);
+          }
+        } else {
+          setPendingTransfer(null);
+        }
+      } catch (e) {
+        console.error("Failed to check pending transfers", e);
+        setPendingTransfer(null);
+      }
+    }
+    if (id && currentUser) void checkPendingTransfer();
+  }, [id, currentUser]);  
+  
 
   async function onVerify() {
     setVerifying(true);
@@ -101,6 +135,42 @@ export default function EvidenceDetailPage() {
       <div className="p-6 text-sm text-zinc-500">Loading evidence…</div>
     );
   }
+
+  async function handleAcceptTransfer() {
+    if (!pendingTransfer) return;
+    setTransferActionLoading(true);
+    try {
+      const transferId = pendingTransfer.eventMetadata?.transfer_id;
+      if (!transferId) throw new Error("Transfer ID not found in custody record");
+      
+      await acceptTransfer(id, transferId, "Accepted via UI");
+      setActionMsg("✅ Transfer accepted successfully!");
+      setPendingTransfer(null);
+      await load();
+    } catch (e) {
+      setActionMsg(e instanceof Error ? e.message : "Failed to accept transfer");
+    } finally {
+      setTransferActionLoading(false);
+    }
+  }
+
+  async function handleRejectTransfer() {
+    if (!pendingTransfer) return;
+    setTransferActionLoading(true);
+    try {
+      const transferId = pendingTransfer.eventMetadata?.transfer_id;
+      if (!transferId) throw new Error("Transfer ID not found in custody record");
+      
+      await rejectTransfer(id, transferId, "Rejected via UI");
+      setActionMsg("❌ Transfer rejected.");
+      setPendingTransfer(null);
+      await load();
+    } catch (e) {
+      setActionMsg(e instanceof Error ? e.message : "Failed to reject transfer");
+    } finally {
+      setTransferActionLoading(false);
+    }
+  }  
 
   if (error || !evidence) {
     return (
@@ -154,7 +224,6 @@ export default function EvidenceDetailPage() {
             </button>
           )}
 
-          {/* Download only if JWT user has evidence.content.read */}
           {showDownload && (
             <button
               type="button"
@@ -178,6 +247,34 @@ export default function EvidenceDetailPage() {
           {actionMsg}
         </p>
       )}
+
+      {/* 👇 ONLY SHOW BANNER IF CURRENT USER IS THE RECIPIENT */}
+      {pendingTransfer && currentUser?.id === pendingTransfer.toUserId && (
+        <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4">
+          <h3 className="text-sm font-semibold text-amber-400 mb-2">
+            Pending Transfer Request
+          </h3>
+          <p className="text-sm text-zinc-400 mb-4">
+            Purpose: {pendingTransfer.purpose}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => void handleAcceptTransfer()}
+              disabled={transferActionLoading}
+              className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50 transition"
+            >
+              Accept Transfer
+            </button>
+            <button
+              onClick={() => void handleRejectTransfer()}
+              disabled={transferActionLoading}
+              className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50 transition"
+            >
+              Reject Transfer
+            </button>
+          </div>
+        </div>
+      )}      
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">

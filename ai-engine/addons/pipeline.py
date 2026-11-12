@@ -77,7 +77,7 @@ class AnalysisPipeline:
         )      
         signals.extend(
             ThreatSignal(
-                signal=label.casefold().replace("","_"),
+                signal=label.casefold().replace(" ","_"),
                 confidence=confidence,
                 source="object_detection",
             )
@@ -148,12 +148,25 @@ class AnalysisPipeline:
     ) -> tuple[str, tuple[object, ...], bool]:
         try:
             if not detector.is_ready:
+                logger.warning("addon_detector_not_ready", capability=name) # <-- ADD THIS
                 return name, (), True
-            values = await asyncio.to_thread(detector.detect, frame)
+            
+            logger.info("addon_detector_running", capability=name) # <-- ADD THIS
+            values = await asyncio.to_thread(detector.detect, frame)            
+                        
+            # ADD THIS: Print exactly what the threat model detected
+            if name == "threat" and len(values) > 0:
+                logger.info(
+                    "threat_model_detected", 
+                    detections=[{"signal": v.signal, "confidence": v.confidence} for v in values if hasattr(v, 'signal')]
+                )
+            logger.info("addon_detector_finished", capability=name, count=len(values)) # <-- ADD THIS
+            
             return name, tuple(values), False
         except Exception as exception:
             logger.warning(
                 "addon_detection_degraded",
+                
                 capability=name,
                 error_type=type(exception).__name__,
             )

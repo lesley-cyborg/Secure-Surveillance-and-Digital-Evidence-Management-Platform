@@ -2,14 +2,18 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Shield, RefreshCw } from "lucide-react";
+import { Shield, RefreshCw, Download, ShieldCheck } from "lucide-react";
 import { listEvidence } from "@/features/evidence/api";
+import { getAccessToken } from "@/lib/auth"; // 👈 Import your auth helper
 import {
   evidenceStatusClass,
   formatBytes,
   shortHash,
 } from "@/features/evidence/statusStyles";
 import type { Evidence } from "@/types/evidence";
+
+// 👇 Define API base URL
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
 
 export default function EvidencePage() {
   const [items, setItems] = useState<Evidence[]>([]);
@@ -34,6 +38,71 @@ export default function EvidencePage() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  const handleDownload = async (evidenceId: string, filename: string) => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error("Not authenticated");
+
+      // Use the existing /content endpoint with disposition=attachment
+      const res = await fetch(`${API_BASE}/api/v1/evidence/${evidenceId}/content?disposition=attachment`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("Failed to download");
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename || "evidence_file";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("Failed to download evidence.");
+    }
+  };
+
+  const handleVerify = async (evidenceId: string) => {
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error("Not authenticated");
+
+      // Your backend requires an Idempotency-Key for the verify endpoint
+      const idempotencyKey = crypto.randomUUID();
+
+      const res = await fetch(`${API_BASE}/api/v1/evidence/${evidenceId}/verify`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Idempotency-Key": idempotencyKey, // 👈 Crucial for your backend
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      if (data.verificationStatus === "VERIFIED") {
+        alert(`✅ VERIFIED\n\nEvidence integrity and authenticity confirmed.`);
+      } else {
+        alert(`⚠️ VERIFICATION FAILED\n\nStatus: ${data.verificationStatus}`);
+      }
+
+      // Refresh the evidence list to show updated verification status
+      void refresh();
+    } catch (err) {
+      console.error("Verification error:", err);
+      alert(`Failed to verify evidence: ${err instanceof Error ? err.message : "Unknown error"}`);
+    }
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -98,6 +167,7 @@ export default function EvidencePage() {
                 <th className="px-4 py-3 font-medium">SHA-256</th>
                 <th className="px-4 py-3 font-medium">Size</th>
                 <th className="px-4 py-3 font-medium">Ingested</th>
+                <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -132,6 +202,27 @@ export default function EvidencePage() {
                   </td>
                   <td className="px-4 py-3 text-xs text-zinc-500">
                     {new Date(e.ingestedAt).toLocaleString()}
+                  </td>
+                  {/* 👇 Added Actions Column */}
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleVerify(e.id)}
+                        className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-emerald-500 transition-colors"
+                        title="Verify cryptographic integrity"
+                      >
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        Verify
+                      </button>
+                      <button
+                        onClick={() => handleDownload(e.id, e.originalFilename)}
+                        className="inline-flex items-center gap-1.5 rounded-md bg-zinc-700 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-zinc-600 transition-colors"
+                        title="Download evidence file"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        Download
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

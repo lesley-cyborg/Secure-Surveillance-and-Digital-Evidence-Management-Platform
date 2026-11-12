@@ -94,3 +94,55 @@ export function downloadBlob(blob: Blob, filename: string): void {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export async function getCustodyEvents(evidenceId: string) {
+  return apiRequest<any>(`/api/v1/evidence/${evidenceId}/custody-events?page=1&page_size=25`);
+}
+
+export async function initiateTransfer(
+  evidenceId: string, 
+  payload: { toUserId: string; purpose: string; expiresAt: string }
+) {
+  const token = getAccessToken();
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:8000'}/api/v1/evidence/${evidenceId}/transfers`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": idempotencyKey(),
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || `HTTP ${res.status}`);
+  }
+  
+  return res.json();
+}
+
+export async function acceptTransfer(evidenceId: string, transferId: string, comment: string = "Transfer accepted") {
+  return apiRequest(`/api/v1/evidence/${evidenceId}/transfers/${transferId}/accept`, {
+    method: "POST",
+    headers: {
+      "Idempotency-Key": idempotencyKey(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ comment }),
+  });
+}
+
+export async function rejectTransfer(evidenceId: string, transferId: string, comment: string = "Transfer rejected") {
+  return apiRequest(`/api/v1/evidence/${evidenceId}/transfers/${transferId}/reject`, {
+    method: "POST",
+    headers: {
+      "Idempotency-Key": idempotencyKey(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ comment }),
+  });
+}

@@ -25,6 +25,14 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  
+  // 👇 1. Add mounted state to track client-side rendering
+  const [mounted, setMounted] = useState(false);
+
+  // 👇 2. Set mounted to true only after the component mounts on the client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const canExport = canExportReports();
 
@@ -95,7 +103,8 @@ export default function AnalyticsPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {canExport && (
+          {/* 👇 3. Add 'mounted &&' to prevent hydration mismatch on export buttons */}
+          {mounted && canExport && (
             <>
               <button
                 type="button"
@@ -131,7 +140,8 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {!canExport && (
+      {/* 👇 4. Add 'mounted &&' to prevent hydration mismatch on the warning message */}
+      {mounted && !canExport && (
         <p className="text-[11px] text-zinc-600">
           CSV export requires reports.export (or equivalent) permission.
         </p>

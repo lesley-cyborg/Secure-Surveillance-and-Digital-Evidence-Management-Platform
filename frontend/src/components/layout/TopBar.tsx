@@ -89,7 +89,7 @@ export function TopBar() {
   return (
     <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-800 bg-zinc-900/90 px-4">
       <h1 className="text-sm font-semibold tracking-wide text-zinc-100">
-        Secure Surveillance Platform
+        AI-Powered Surveillance Platform
       </h1>
       <div className="flex items-center gap-3 text-xs text-zinc-400">
         <span className="font-mono tabular-nums">{now ?? "--:--:--"} CAT</span>

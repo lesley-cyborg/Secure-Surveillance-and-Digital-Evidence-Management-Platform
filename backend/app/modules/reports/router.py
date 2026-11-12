@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Annotated, Literal
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -45,7 +45,8 @@ async def export_incidents(
         AuthorizationContext,
         Depends(require_permission("reports.export")),
     ],
-    days: Annotated[Literal[7, 14, 30], Query()] = 7,
+    # Changed from Literal[7, 14, 30] to int with ge=1, le=30 constraints
+    days: Annotated[int, Query(ge=1, le=30)] = 7,
     camera_id: Annotated[UUID | None, Query(alias="cameraId")] = None,
     status: Annotated[str | None, Query()] = None,
 ) -> Response:
@@ -70,7 +71,8 @@ async def export_analytics_summary(
         AuthorizationContext,
         Depends(require_permission("reports.export")),
     ],
-    days: Annotated[Literal[7, 14, 30], Query()] = 7,
+    # Changed from Literal[7, 14, 30] to int with ge=1, le=30 constraints
+    days: Annotated[int, Query(ge=1, le=30)] = 7,
     camera_id: Annotated[UUID | None, Query(alias="cameraId")] = None,
 ) -> Response:
     csv_body = await export_analytics_summary_csv(
