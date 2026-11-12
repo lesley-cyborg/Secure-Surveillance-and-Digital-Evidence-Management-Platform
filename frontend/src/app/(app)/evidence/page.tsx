@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Shield, RefreshCw, Download, ShieldCheck } from "lucide-react";
+import { Shield, RefreshCw } from "lucide-react";
 import { listEvidence } from "@/features/evidence/api";
-import { getAccessToken } from "@/lib/auth"; // 👈 Import your auth helper
 import {
   evidenceStatusClass,
   formatBytes,

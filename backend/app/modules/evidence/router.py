@@ -8,7 +8,6 @@ from typing import Annotated, Literal
 from urllib.parse import quote
 from uuid import UUID, uuid4
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import (
@@ -28,6 +27,7 @@ from app.db.models.enums import (
     EvidenceStatus,
     TransferStatus,
     VerificationStatus,
+    EvidenceStatus,
 )
 from app.db.models.evidence import CustodyRecord, Evidence, EvidenceVerification
 from app.modules.evidence.content_access import (
@@ -39,6 +39,11 @@ from app.modules.evidence.dependencies import (
     EvidenceTransferDecisionServiceAccess,
     EvidenceTransferInitiationServiceAccess,
     EvidenceVerificationHTTPServiceAccess,
+    DatabaseSession,
+)
+from app.modules.evidence.http_schemas import(
+    EvidenceListResponse,
+    EvidenceResponse,
 )
 from app.modules.evidence.errors import (
     EvidenceRetrievalHashMismatchError,

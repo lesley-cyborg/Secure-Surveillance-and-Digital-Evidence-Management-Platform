@@ -4,14 +4,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Download, ShieldCheck, Loader2 } from "lucide-react";
-import { 
-  downloadBlob, 
-  fetchEvidenceContent, 
-  getEvidence, 
+import {
+  downloadBlob,
+  fetchEvidenceContent,
+  getEvidence,
   verifyEvidence,
-  getCustodyEvents,       
-  acceptTransfer,         
-  rejectTransfer          
 } from "@/features/evidence/api";
 import {
   evidenceStatusClass,
@@ -64,32 +61,6 @@ export default function EvidenceDetailPage() {
   useEffect(() => {
     void load();
   }, [load]);
-
-  useEffect(() => {
-    async function checkPendingTransfer() {
-      try {
-        const data = await getCustodyEvents(id);
-        const initiatedEvents = data.items.filter((e: any) => e.eventType === "TRANSFER_INITIATED");
-        if (initiatedEvents.length > 0) {
-          const latest = initiatedEvents[initiatedEvents.length - 1];
-          
-          // 👇 ONLY SET PENDING TRANSFER IF CURRENT USER IS THE RECIPIENT
-          if (currentUser?.id && latest.toUserId === currentUser.id) {
-            setPendingTransfer(latest);
-          } else {
-            setPendingTransfer(null);
-          }
-        } else {
-          setPendingTransfer(null);
-        }
-      } catch (e) {
-        console.error("Failed to check pending transfers", e);
-        setPendingTransfer(null);
-      }
-    }
-    if (id && currentUser) void checkPendingTransfer();
-  }, [id, currentUser]);  
-  
 
   async function onVerify() {
     setVerifying(true);
@@ -224,6 +195,7 @@ export default function EvidenceDetailPage() {
             </button>
           )}
 
+          {/* Download only if JWT user has evidence.content.read */}
           {showDownload && (
             <button
               type="button"

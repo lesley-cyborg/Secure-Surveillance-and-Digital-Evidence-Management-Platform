@@ -103,8 +103,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {/* 👇 3. Add 'mounted &&' to prevent hydration mismatch on export buttons */}
-          {mounted && canExport && (
+          {canExport && (
             <>
               <button
                 type="button"
@@ -140,8 +139,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* 👇 4. Add 'mounted &&' to prevent hydration mismatch on the warning message */}
-      {mounted && !canExport && (
+      {!canExport && (
         <p className="text-[11px] text-zinc-600">
           CSV export requires reports.export (or equivalent) permission.
         </p>

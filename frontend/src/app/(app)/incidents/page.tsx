@@ -10,6 +10,10 @@ import type { Incident, Severity, IncidentStatus } from "@/types/incident";
 // Use environment variable for API base, fallback to 127.0.0.1:8000
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
 
+import { AlertTriangle, Shield, Clock, Eye } from "lucide-react";
+import { listIncidents } from "@/features/incidents/api";
+import type { Incident, Severity, IncidentStatus } from "@/types/incident";
+
 const getSeverityColor = (severity: Severity) => {
   switch (severity) {
     case "CRITICAL": return "bg-red-500/10 text-red-400 border-red-500/20";
@@ -26,6 +30,7 @@ const getStatusColor = (status: IncidentStatus) => {
     case "INVESTIGATING": return "text-amber-400";
     case "RESOLVED": 
     case "CLOSED": return "text-zinc-500";
+    case "RESOLVED": case "CLOSED": return "text-zinc-500";
     default: return "text-zinc-300";
   }
 };
@@ -41,6 +46,7 @@ export default function IncidentsPage() {
     setError(null);
     try {
       const data = await listIncidents({ limit: 50 }); 
+      const data = await listIncidents(50, 0);
       setIncidents(data.items);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load incidents");
@@ -94,6 +100,9 @@ export default function IncidentsPage() {
       window.alert(`❌ Failed to create evidence: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
   }, [router]);
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   return (
     <div className="space-y-6 p-6">
@@ -194,6 +203,9 @@ export default function IncidentsPage() {
                           <Eye className="h-4 w-4" />
                         </button>
                       </div>
+                      <button className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 transition">
+                        <Eye className="h-4 w-4" />
+                      </button>
                     </td>
                   </tr>
                 ))}
