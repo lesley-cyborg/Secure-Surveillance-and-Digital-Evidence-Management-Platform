@@ -6,6 +6,8 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
+from addons.schemas import AddonAnalysisResult
+
 
 def _require_non_empty(
     value: str,
@@ -153,7 +155,9 @@ class StreamDetectionEvent:
 
     inference_duration_ms: float
     schema_version: Literal["1.0", "1.1"] = "1.0"
-    analysis: dict[str, object] | None = None
+    
+    # ✅ Fixed: Single, correctly typed analysis field
+    analysis: AddonAnalysisResult | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -200,3 +204,5 @@ class StreamDetectionEvent:
     @property
     def contains_detections(self) -> bool:
         return bool(self.detections)
+
+# ✅ REMOVED: Dataclasses do not have .model_rebuild()

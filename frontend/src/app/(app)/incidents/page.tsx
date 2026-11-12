@@ -1,6 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { AlertTriangle, Shield, Clock, Eye, ShieldCheck } from "lucide-react";
+import { listIncidents } from "@/features/incidents/api";
+import { getAccessToken } from "@/lib/auth"; // 👈 Import your app's auth helper
+import type { Incident, Severity, IncidentStatus } from "@/types/incident";
+
+// Use environment variable for API base, fallback to 127.0.0.1:8000
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+
 import { AlertTriangle, Shield, Clock, Eye } from "lucide-react";
 import { listIncidents } from "@/features/incidents/api";
 import type { Incident, Severity, IncidentStatus } from "@/types/incident";
@@ -19,12 +28,15 @@ const getStatusColor = (status: IncidentStatus) => {
   switch (status) {
     case "NEW": return "text-emerald-400";
     case "INVESTIGATING": return "text-amber-400";
+    case "RESOLVED": 
+    case "CLOSED": return "text-zinc-500";
     case "RESOLVED": case "CLOSED": return "text-zinc-500";
     default: return "text-zinc-300";
   }
 };
 
 export default function IncidentsPage() {
+  const router = useRouter();
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +45,7 @@ export default function IncidentsPage() {
     setLoading(true);
     setError(null);
     try {
+      const data = await listIncidents({ limit: 50 }); 
       const data = await listIncidents(50, 0);
       setIncidents(data.items);
     } catch (e) {
@@ -42,6 +55,51 @@ export default function IncidentsPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  const handleCreateEvidence = useCallback(async (incidentId: string, incidentNumber: string) => {
+    if (!window.confirm(`Create evidence for incident ${incidentNumber}?`)) {
+      return;
+    }
+
+    try {
+      // 👇 Use your app's official token getter
+      const token = getAccessToken();
+      if (!token) {
+        throw new Error("Not authenticated. Please log in again.");
+      }
+
+      const res = await fetch(
+        `${API_BASE}/api/v1/incidents/${incidentId}/create-evidence`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`, // 👈 Attach the real token
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const msg = body?.detail?.message ?? body?.detail ?? `HTTP ${res.status}`;
+        throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+      }
+
+      const data = await res.json();
+      window.alert(`✅ Evidence created successfully!\n\nEvidence Number: ${data.evidence_number}`);
+      
+      // Redirect to evidence page after success
+      router.push("/evidence");
+    } catch (err) {
+      console.error("Error creating evidence:", err);
+      window.alert(`❌ Failed to create evidence: ${err instanceof Error ? err.message : "Unknown error"}`);
+    }
+  }, [router]);
   useEffect(() => {
     void refresh();
   }, [refresh]);
@@ -126,6 +184,25 @@ export default function IncidentsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCreateEvidence(incident.id, incident.incidentNumber)}
+                          className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-blue-500 transition-colors"
+                          title="Create evidence from this incident"
+                        >
+                          <ShieldCheck className="h-3.5 w-3.5" />
+                          Create Evidence
+                        </button>
+                        
+                        <button 
+                          type="button"
+                          className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 transition"
+                          title="View incident details"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      </div>
                       <button className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 transition">
                         <Eye className="h-4 w-4" />
                       </button>

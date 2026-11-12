@@ -7,13 +7,16 @@ from addons.schemas import BoundingBox, PlateCandidate, PoseObservation, ThreatS
 
 _WEAPON_ALIASES: dict[str, str] = {
     "knife": "knife",
-    "sword": "sword",
-    "rifle": "rifle",
     "pistol": "pistol",
     "handgun": "pistol",
-    "gun": "pistol",
-    "firearm": "firearm",
-    "weapon": "weapon",   
+    "rifle": "rifle",
+    "sword": "weapon",
+    "weapon": "weapon",
+    "firearm": "weapon",
+    "gun": "weapon",
+    # Explicitly ignore background/person classes from the weapon model
+    "0": None,
+    "person": None,
 }
 
 _SKIP_LABELS: frozenset[str] = frozenset({"0", "person"})

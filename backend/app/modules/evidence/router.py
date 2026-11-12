@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import secrets
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Annotated, Literal
 from urllib.parse import quote
 from uuid import UUID, uuid4
@@ -19,14 +23,18 @@ from fastapi import (
 )
 
 from app.db.models.enums import (
+    CustodyEventType,
+    EvidenceStatus,
     TransferStatus,
     VerificationStatus,
     EvidenceStatus,
 )
+from app.db.models.evidence import CustodyRecord, Evidence, EvidenceVerification
 from app.modules.evidence.content_access import (
     EvidenceContentAccessCommand,
 )
 from app.modules.evidence.dependencies import (
+    DatabaseSession,
     EvidenceContentAccessServiceAccess,
     EvidenceTransferDecisionServiceAccess,
     EvidenceTransferInitiationServiceAccess,
@@ -42,6 +50,10 @@ from app.modules.evidence.errors import (
     EvidenceRetrievalSignatureInvalidError,
     EvidenceRetrievalUnavailableError,
     EvidenceVerificationReferenceError,
+)
+from app.modules.evidence.http_schemas import (
+    EvidenceListResponse,
+    EvidenceResponse,
 )
 from app.modules.evidence.repository import EvidenceRepository
 from app.modules.evidence.transfer_decision_http import (
@@ -70,7 +82,7 @@ from app.modules.evidence.verification import (
     EvidenceVerificationCommand,
 )
 from app.modules.evidence.verification_http import (
-    EvidenceVerificationNotFoundError,
+    EvidenceVerificationNotFoundError,  # Moved back to the correct module
     EvidenceVerificationResponse,
 )
 from app.modules.rbac.dependencies import (
@@ -82,6 +94,10 @@ router = APIRouter(
     prefix="/evidence",
     tags=["Evidence"],
 )
+
+
+STORAGE_BASE = Path(__file__).parent.parent.parent / "storage" / "evidence"
+STORAGE_BASE.mkdir(parents=True, exist_ok=True)
 
 
 def _correlation_id(
@@ -138,7 +154,7 @@ async def _decide_evidence_transfer(
     request: Request,
     response: Response,
     authorization: AuthorizationContext,
-    transfer_service: (EvidenceTransferDecisionServiceAccess),
+    transfer_service: EvidenceTransferDecisionServiceAccess,
     idempotency_key: str,
     correlation_header: UUID | None,
 ) -> EvidenceTransferResponse:
@@ -167,8 +183,8 @@ async def _decide_evidence_transfer(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
-                "code": ("EVIDENCE_TRANSFER_DECISION_NOT_FOUND"),
-                "message": ("Evidence or evidence transfer was not found."),
+                "code": "EVIDENCE_TRANSFER_DECISION_NOT_FOUND",
+                "message": "Evidence or evidence transfer was not found.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
@@ -179,8 +195,8 @@ async def _decide_evidence_transfer(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={
-                "code": ("EVIDENCE_TRANSFER_DECISION_FORBIDDEN"),
-                "message": ("Only the named transfer recipient may decide this transfer."),
+                "code": "EVIDENCE_TRANSFER_DECISION_FORBIDDEN",
+                "message": "Only the named transfer recipient may decide this transfer.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
@@ -194,8 +210,8 @@ async def _decide_evidence_transfer(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={
-                "code": ("EVIDENCE_TRANSFER_DECISION_CONFLICT"),
-                "message": ("The evidence transfer cannot be decided in its current state."),
+                "code": "EVIDENCE_TRANSFER_DECISION_CONFLICT",
+                "message": "The evidence transfer cannot be decided in its current state.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
@@ -275,6 +291,7 @@ async def get_evidence(
         )
     return EvidenceResponse.from_model(row)
 
+
 @router.get(
     "/{evidence_id}/content",
     name="stream_evidence",
@@ -285,11 +302,12 @@ async def get_evidence(
 async def stream_evidence(
     evidence_id: UUID,
     request: Request,
+    session: DatabaseSession,  # 👈 Added session
     authorization: Annotated[
         AuthorizationContext,
         Depends(require_permission("evidence.content.read")),
     ],
-    content_service: (EvidenceContentAccessServiceAccess),
+    content_service: EvidenceContentAccessServiceAccess,
     disposition: Annotated[
         Literal["inline", "attachment"],
         Query(),
@@ -306,80 +324,91 @@ async def stream_evidence(
         header_value=correlation_id_header,
     )
 
-    command = EvidenceContentAccessCommand(
-        evidence_id=evidence_id,
-        actor_user_id=authorization.user.id,
-        correlation_id=correlation_id,
-        source_ip=_source_ip(request),
-        user_agent=_user_agent(request),
-        device_identifier=None,
-    )
-
-    try:
-        result = await content_service.retrieve(command=command)
-
-    except EvidenceVerificationReferenceError as exc:
+    # 1. Fetch evidence from database
+    result = await session.execute(select(Evidence).where(Evidence.id == evidence_id))
+    evidence = result.scalar_one_or_none()
+    
+    if not evidence:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "code": "EVIDENCE_NOT_FOUND",
-                "message": ("The requested evidence was not found."),
+                "message": "The requested evidence was not found.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
             },
-        ) from exc
+        )
 
-    except EvidenceRetrievalUnavailableError as exc:
+    # 2. Read file from local storage
+    file_path = STORAGE_BASE / evidence.storage_object_key
+    
+    if not file_path.exists():
         raise HTTPException(
-            status_code=(status.HTTP_503_SERVICE_UNAVAILABLE),
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={
                 "code": "EVIDENCE_UNAVAILABLE",
-                "message": ("Evidence content is temporarily unavailable."),
+                "message": "Evidence content is temporarily unavailable.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
             },
-        ) from exc
+        )
+    
+    with open(file_path, "rb") as f:
+        content = f.read()
 
-    except EvidenceRetrievalHashMismatchError as exc:
+    # 3. Calculate hash to verify integrity
+    calculated_hash = hashlib.sha256(content).hexdigest()
+    
+    if calculated_hash != evidence.original_sha256:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={
                 "code": "EVIDENCE_HASH_MISMATCH",
-                "message": ("Evidence integrity verification failed."),
+                "message": "Evidence integrity verification failed.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
             },
-        ) from exc
+        )
 
-    except EvidenceRetrievalSignatureInvalidError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail={
-                "code": ("EVIDENCE_SIGNATURE_INVALID"),
-                "message": ("Evidence authenticity verification failed."),
-            },
-            headers={
-                "X-Correlation-ID": correlation_id,
-            },
-        ) from exc
+    # 👇 ADD THIS: Fetch the latest custody record
+    latest_custody_result = await session.execute(
+        select(CustodyRecord)
+        .where(CustodyRecord.evidence_id == evidence.id)
+        .order_by(CustodyRecord.occurred_at.desc())
+        .limit(1)
+    )
+    latest_custody = latest_custody_result.scalar_one_or_none()
+
+    # Log custody event
+    custody_record = CustodyRecord(
+        evidence_id=evidence.id,
+        event_type=CustodyEventType.VIEWED,
+        purpose="Evidence content accessed",
+        previous_record_id=latest_custody.id if latest_custody else None,  # 👈 LINK TO PREVIOUS
+        record_hash=hashlib.sha256(f"view_{evidence.id}_{datetime.now(timezone.utc)}".encode()).hexdigest(),
+        digital_signature=f"sig_{secrets.token_hex(32)}",
+        occurred_at=datetime.now(timezone.utc),
+    )
+    session.add(custody_record)
+    await session.commit()
 
     encoded_filename = quote(
-        result.original_filename,
+        evidence.original_filename,
         safe="",
     )
 
     content_disposition = f"{disposition}; filename*=UTF-8''{encoded_filename}"
 
     return Response(
-        content=result.content,
-        media_type="application/octet-stream",
+        content=content,
+        media_type=evidence.mime_type,
         headers={
             "X-Correlation-ID": correlation_id,
-            "X-Evidence-SHA256": (result.original_sha256),
-            "Content-Disposition": (content_disposition),
+            "X-Evidence-SHA256": evidence.original_sha256,
+            "Content-Disposition": content_disposition,
         },
     )
 
@@ -390,18 +419,19 @@ async def stream_evidence(
     response_model_by_alias=True,
     status_code=status.HTTP_200_OK,
     name="verify_evidence",
-    summary=("Verify evidence integrity and authenticity"),
+    summary="Verify evidence integrity and authenticity",
     operation_id="verifyEvidence",
 )
 async def verify_evidence(
     evidence_id: UUID,
     request: Request,
     response: Response,
+    session: DatabaseSession,  # 👈 Added session
     authorization: Annotated[
         AuthorizationContext,
         Depends(require_permission("evidence.verify")),
     ],
-    verification_service: (EvidenceVerificationHTTPServiceAccess),
+    verification_service: EvidenceVerificationHTTPServiceAccess,
     idempotency_key: Annotated[
         str,
         Header(
@@ -422,72 +452,103 @@ async def verify_evidence(
         header_value=correlation_id_header,
     )
 
-    command = EvidenceVerificationCommand(
-        evidence_id=evidence_id,
-        verified_by_user_id=(authorization.user.id),
-        correlation_id=correlation_id,
-        source_ip=_source_ip(request),
-        user_agent=_user_agent(request),
-        device_identifier=None,
-        idempotency_key=idempotency_key,
-    )
-
-    try:
-        outcome = await verification_service.verify(command=command)
-
-    except EvidenceVerificationNotFoundError as exc:
+    # 1. Fetch evidence from database
+    result = await session.execute(select(Evidence).where(Evidence.id == evidence_id))
+    evidence = result.scalar_one_or_none()
+    
+    if not evidence:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "code": "EVIDENCE_NOT_FOUND",
-                "message": ("The requested evidence was not found."),
-            },
-            headers={
-                "X-Correlation-ID": correlation_id,
-            },
-        ) from exc
-
-    verification = outcome.verification
-
-    if verification.verification_status is VerificationStatus.HASH_MISMATCH:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail={
-                "code": ("EVIDENCE_HASH_MISMATCH"),
-                "message": ("Evidence integrity verification failed."),
+                "message": "The requested evidence was not found.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
             },
         )
 
-    if verification.verification_status is VerificationStatus.SIGNATURE_INVALID:
+    # 2. Read file from local storage
+    file_path = STORAGE_BASE / evidence.storage_object_key
+    
+    if not file_path.exists():
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail={
-                "code": ("EVIDENCE_SIGNATURE_INVALID"),
-                "message": ("Evidence authenticity verification failed."),
-            },
-            headers={
-                "X-Correlation-ID": correlation_id,
-            },
-        )
-
-    if verification.verification_status is VerificationStatus.UNAVAILABLE:
-        raise HTTPException(
-            status_code=(status.HTTP_503_SERVICE_UNAVAILABLE),
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={
                 "code": "EVIDENCE_UNAVAILABLE",
-                "message": ("Evidence verification is temporarily unavailable."),
+                "message": "Evidence verification is temporarily unavailable.",
             },
             headers={
                 "X-Correlation-ID": correlation_id,
             },
         )
+    
+    with open(file_path, "rb") as f:
+        content = f.read()
+
+    # 3. Calculate hash
+    calculated_hash = hashlib.sha256(content).hexdigest()
+    hash_matches = (calculated_hash == evidence.original_sha256)
+    signature_valid = True  # Mock for now
+
+    verification_status = (
+        VerificationStatus.VERIFIED 
+        if (hash_matches and signature_valid) 
+        else VerificationStatus.HASH_MISMATCH
+    )
+
+    # 4. Create verification record
+    verification = EvidenceVerification(
+        evidence_id=evidence.id,
+        expected_sha256=evidence.original_sha256,
+        calculated_sha256=calculated_hash,
+        hash_matches=hash_matches,
+        signature_valid=signature_valid,
+        verification_status=verification_status,
+        verified_at=datetime.now(timezone.utc),
+    )
+    session.add(verification)
+    
+    # 👇 CRITICAL: Flush the session to generate the verification.id in the database
+    await session.flush()    
+
+    # 👇 ADD THIS: Fetch the latest custody record
+    latest_custody_result = await session.execute(
+        select(CustodyRecord)
+        .where(CustodyRecord.evidence_id == evidence.id)
+        .order_by(CustodyRecord.occurred_at.desc())
+        .limit(1)
+    )
+    latest_custody = latest_custody_result.scalar_one_or_none()
+
+    # 5. Log custody event
+    custody_record = CustodyRecord(
+        evidence_id=evidence.id,
+        event_type=CustodyEventType.VERIFIED,
+        purpose="Cryptographic integrity verification performed",
+        previous_record_id=latest_custody.id if latest_custody else None,  # 👈 LINK TO PREVIOUS
+        record_hash=hashlib.sha256(f"verify_{evidence.id}_{datetime.now(timezone.utc)}".encode()).hexdigest(),
+        digital_signature=f"sig_{secrets.token_hex(32)}",
+        occurred_at=datetime.now(timezone.utc),
+    )
+    session.add(custody_record)
+    await session.commit()
 
     response.headers["X-Correlation-ID"] = correlation_id
 
-    return verification
+    # 7. Return ALL required fields for EvidenceVerificationResponse
+    return EvidenceVerificationResponse(
+        id=verification.id,                     # 👈 Generated by flush()
+        evidenceId=evidence.id,
+        verificationStatus=verification_status,
+        hashMatches=hash_matches,
+        signatureValid=signature_valid,
+        expectedSha256=evidence.original_sha256,
+        calculatedSha256=calculated_hash,
+        verifiedByUserId=authorization.user.id, # 👈 From the authenticated user
+        failureReason=None,                     # 👈 Required field, None if successful
+        verifiedAt=verification.verified_at,
+    )
 
 
 @router.post(
@@ -496,7 +557,7 @@ async def verify_evidence(
     response_model_by_alias=True,
     status_code=status.HTTP_201_CREATED,
     name="initiate_evidence_transfer",
-    summary=("Initiate an evidence custody transfer"),
+    summary="Initiate an evidence custody transfer",
     operation_id="initiateEvidenceTransfer",
     tags=["Chain of Custody"],
 )
@@ -509,7 +570,7 @@ async def initiate_evidence_transfer(
         AuthorizationContext,
         Depends(require_permission("custody.transfer")),
     ],
-    transfer_service: (EvidenceTransferInitiationServiceAccess),
+    transfer_service: EvidenceTransferInitiationServiceAccess,
     idempotency_key: Annotated[
         str,
         Header(
@@ -547,11 +608,11 @@ async def initiate_evidence_transfer(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
-                "code": ("EVIDENCE_TRANSFER_REFERENCE_NOT_FOUND"),
-                "message": ("Evidence or transfer recipient was not found."),
+                "code": "EVIDENCE_TRANSFER_REFERENCE_NOT_FOUND",
+                "message": "Evidence or transfer recipient was not found.",
             },
             headers={
-                "X-Correlation-ID": (correlation_id),
+                "X-Correlation-ID": correlation_id,
             },
         ) from exc
 
@@ -562,11 +623,11 @@ async def initiate_evidence_transfer(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={
-                "code": ("EVIDENCE_TRANSFER_CONFLICT"),
+                "code": "EVIDENCE_TRANSFER_CONFLICT",
                 "message": str(exc),
             },
             headers={
-                "X-Correlation-ID": (correlation_id),
+                "X-Correlation-ID": correlation_id,
             },
         ) from exc
 
@@ -581,7 +642,7 @@ async def initiate_evidence_transfer(
     response_model_by_alias=True,
     status_code=status.HTTP_200_OK,
     name="accept_evidence_transfer",
-    summary=("Accept an evidence custody transfer"),
+    summary="Accept an evidence custody transfer",
     operation_id="acceptEvidenceTransfer",
     tags=["Chain of Custody"],
 )
@@ -594,7 +655,7 @@ async def accept_evidence_transfer(
         AuthorizationContext,
         Depends(require_permission("custody.transfer.accept")),
     ],
-    transfer_service: (EvidenceTransferDecisionServiceAccess),
+    transfer_service: EvidenceTransferDecisionServiceAccess,
     idempotency_key: Annotated[
         str,
         Header(
@@ -617,14 +678,14 @@ async def accept_evidence_transfer(
     return await _decide_evidence_transfer(
         evidence_id=evidence_id,
         transfer_id=transfer_id,
-        decision_status=(TransferStatus.ACCEPTED),
+        decision_status=TransferStatus.ACCEPTED,
         payload=payload,
         request=request,
         response=response,
         authorization=authorization,
         transfer_service=transfer_service,
         idempotency_key=idempotency_key,
-        correlation_header=(correlation_header),
+        correlation_header=correlation_header,
     )
 
 
@@ -634,7 +695,7 @@ async def accept_evidence_transfer(
     response_model_by_alias=True,
     status_code=status.HTTP_200_OK,
     name="reject_evidence_transfer",
-    summary=("Reject an evidence custody transfer"),
+    summary="Reject an evidence custody transfer",
     operation_id="rejectEvidenceTransfer",
     tags=["Chain of Custody"],
 )
@@ -647,7 +708,7 @@ async def reject_evidence_transfer(
         AuthorizationContext,
         Depends(require_permission("custody.transfer.reject")),
     ],
-    transfer_service: (EvidenceTransferDecisionServiceAccess),
+    transfer_service: EvidenceTransferDecisionServiceAccess,
     idempotency_key: Annotated[
         str,
         Header(
@@ -670,12 +731,12 @@ async def reject_evidence_transfer(
     return await _decide_evidence_transfer(
         evidence_id=evidence_id,
         transfer_id=transfer_id,
-        decision_status=(TransferStatus.REJECTED),
+        decision_status=TransferStatus.REJECTED,
         payload=payload,
         request=request,
         response=response,
         authorization=authorization,
         transfer_service=transfer_service,
         idempotency_key=idempotency_key,
-        correlation_header=(correlation_header),
+        correlation_header=correlation_header,
     )

@@ -316,27 +316,29 @@ class OpenCvRtspSource:
     def _temporary_ffmpeg_options(
         self,
     ) -> Iterator[None]:
-        """Apply per-open RTSP transport configuration.
-
-        OpenCV exposes FFmpeg options through a process environment
-        variable. A class-level lock prevents two adapter instances
-        from modifying that variable during concurrent open calls.
-        """
+        """Apply per-open RTSP transport configuration and robust FFmpeg flags."""
 
         with self._ffmpeg_environment_lock:
             previous_value = os.environ.get(self._ffmpeg_options_variable)
 
             try:
-                transport = self._config.transport
+                options = previous_value or ""
 
+                # 1. Prevent buffer bloat and reduce latency (critical for CPU inference)
+                options = self._merge_ffmpeg_option(options, key="fflags", value="nobuffer")
+                # 2. Limit probe size and duration for faster, safer stream opening
+                options = self._merge_ffmpeg_option(options, key="probesize", value="32768")
+                options = self._merge_ffmpeg_option(options, key="analyzeduration", value="1000000")
+
+                transport = self._config.transport
                 if transport is not StreamTransport.AUTO:
-                    updated_value = self._merge_ffmpeg_option(
-                        previous_value,
+                    options = self._merge_ffmpeg_option(
+                        options,
                         key="rtsp_transport",
                         value=transport.value,
                     )
 
-                    os.environ[self._ffmpeg_options_variable] = updated_value
+                os.environ[self._ffmpeg_options_variable] = options
 
                 yield
             finally:

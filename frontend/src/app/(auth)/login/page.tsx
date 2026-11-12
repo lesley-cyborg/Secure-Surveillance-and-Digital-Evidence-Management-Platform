@@ -79,7 +79,7 @@ export default function LoginPage() {
     <div className="w-full max-w-md rounded-xl border border-zinc-800 bg-zinc-900 p-8 shadow-xl">
       <div className="mb-8 text-center">
         <h1 className="text-lg font-semibold tracking-wide text-zinc-50">
-          Secure Surveillance Platform
+          AI-Powered Surveillance Platform
         </h1>
         <p className="mt-1 text-sm text-zinc-500">Sign in to continue</p>
       </div>

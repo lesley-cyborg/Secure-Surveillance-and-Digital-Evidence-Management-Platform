@@ -108,10 +108,15 @@ def stream_detection_event_to_payload(
             "processed_at": _format_datetime(event.processed_at),
         },
     }
+    
+    # ✅ FIX: Convert the Pydantic AddonAnalysisResult to a standard dictionary
     if event.analysis is not None:
-        payload["analysis"] = event.analysis
-    return payload
+        if hasattr(event.analysis, "model_dump"):
+            payload["analysis"] = event.analysis.model_dump()
+        else:
+            payload["analysis"] = event.analysis.dict() # Fallback for older Pydantic
 
+    return payload
 
 def serialize_stream_detection_event(
     event: StreamDetectionEvent,

@@ -28,6 +28,13 @@ def build_stream_detection_event(
     result: DetectionResult,
 ) -> StreamDetectionEvent:
     """Combine camera context with a detection result."""
+    
+    # 1. Safely get the analysis data (if it was attached by the pipeline)
+    analysis_data = getattr(result, "analysis", None)
+    
+    # 2. Explicitly set schema version based on whether analysis data exists
+    schema_ver = "1.1" if analysis_data is not None else "1.0"
+
     return StreamDetectionEvent(
         correlation_id=result.correlation_id,
         camera_id=frame.camera_id,
@@ -55,6 +62,8 @@ def build_stream_detection_event(
             for detection in result.detections
         ),
         inference_duration_ms=result.inference_duration_ms,
+        schema_version=schema_ver,  # <-- Explicitly set this to match the data!
+        analysis=analysis_data,
     )
 
 
@@ -64,12 +73,7 @@ def create_stream_result_handler(
     settings: Settings,
     addon_pipeline: AnalysisPipeline | None = None,
 ) -> DetectionResultHandler:
-    """Create the worker callback that publishes detection events.
-
-    addon_pipeline is accepted for composition compatibility. Wire enrichment
-    here only when add-on models are enabled and loaded.
-    """
-    del settings  # reserved for future flags (e.g. enable stream enrichment)
+    """Create the worker callback that publishes detection events."""
 
     async def handle_result(
         frame: StreamFrame,
@@ -78,10 +82,31 @@ def create_stream_result_handler(
         if not isinstance(result, DetectionResult):
             raise TypeError("Stream processor returned an unsupported result type")
 
-        # Optional later:
-        # if addon_pipeline is not None:
-        #     result = await addon_pipeline.enrich(frame, result)
+        # 1. Run the add-on pipeline (threat, plates, pose) if available
+        if addon_pipeline is not None:
+            # Extract primary detections to pass to the addon pipeline
+            primary_detections = [(d.label, d.confidence) for d in result.detections]
+            
+            # Run the analysis (this triggers weapons.pt, etc.)
+            analysis_result = await addon_pipeline.analyze(
+                frame=frame.image,
+                detections=primary_detections,
+                camera_id=frame.camera_id,
+                sequence_number=frame.sequence_number,
+            )
+            
+            # 2. Attach the analysis result to the DetectionResult
+            if hasattr(result, "model_copy"):
+                # If DetectionResult is a Pydantic model
+                result = result.model_copy(update={"analysis": analysis_result})
+            elif dataclasses.is_dataclass(result):
+                # If DetectionResult is a dataclass
+                result = dataclasses.replace(result, analysis=analysis_result)
+            else:
+                # Fallback
+                result.analysis = analysis_result
 
+        # 3. Build and publish the event
         event = build_stream_detection_event(frame=frame, result=result)
         await sink.publish(event)
 

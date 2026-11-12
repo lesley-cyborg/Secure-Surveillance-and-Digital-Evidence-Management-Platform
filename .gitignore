@@ -121,3 +121,15 @@ ai-engine/out1.json
 
 ai-engine/weapon-*.json
 ai-engine/out1.json
+
+# ---- Local test media ----
+*.mp4
+ai-engine/test_video.mp4
+
+# ---- Local evidence storage (never commit evidence files!) ----
+backend/app/storage/
+
+# ---- Generated CSV exports ----
+backend/incidents.csv
+backend/summary.csv
+*.csv

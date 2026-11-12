@@ -31,7 +31,7 @@ class CreateCustodyEventRequest(APIModel):
 class CustodyEventResponse(APIModel):
     id: UUID
     evidence_id: UUID
-    actor_user_id: UUID
+    actor_user_id: UUID | None = None
     from_user_id: UUID | None = None
     to_user_id: UUID | None = None
     previous_record_id: UUID | None = None

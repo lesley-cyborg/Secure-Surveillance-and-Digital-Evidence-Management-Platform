@@ -25,6 +25,14 @@ export default function AnalyticsPage() {
   const [error, setError] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  
+  // 👇 1. Add mounted state to track client-side rendering
+  const [mounted, setMounted] = useState(false);
+
+  // 👇 2. Set mounted to true only after the component mounts on the client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const canExport = canExportReports();
 

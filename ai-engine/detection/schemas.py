@@ -12,6 +12,8 @@ from pydantic import (
     model_validator,
 )
 
+from addons.schemas import AddonAnalysisResult
+
 from detection.exceptions import (
     InvalidBoundingBoxError,
 )
@@ -163,3 +165,8 @@ class DetectionResult(ApiModel):
     processed_at: datetime = Field(
         default_factory=lambda: datetime.now(UTC).replace(microsecond=0)
     )
+    analysis: AddonAnalysisResult | None = None
+
+
+# ✅ THIS MUST BE AT THE VERY BOTTOM, WITH ZERO INDENTATION
+DetectionResult.model_rebuild()

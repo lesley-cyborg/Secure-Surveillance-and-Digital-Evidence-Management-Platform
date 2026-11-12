@@ -239,6 +239,36 @@ class IncidentClassificationPolicy:
         self,
         event: DetectionEventIngestionRequest,
     ) -> IncidentClassificationDecision:
+        # 1. Check addon threat signals FIRST (highest priority)
+        if event.analysis and event.analysis.threat_signals:
+            for threat in event.analysis.threat_signals:
+                # Normalize the signal name (e.g., "Knife" -> "knife")
+                normalized_signal = threat.signal.strip().casefold().replace(" ", "_")
+                rule = self._find_rule(normalized_signal)
+                
+                if rule is not None:
+                    confidence = self._normalize_confidence(threat.confidence)
+                    if confidence >= rule.minimum_confidence:
+                        description = (
+                            f"Addon threat detector identified '{threat.signal}' "
+                            f"with {confidence:.4f} confidence from source '{threat.source}'. "
+                            f"Configured threshold was {rule.minimum_confidence:.4f}."
+                        )
+                        return IncidentClassificationDecision(
+                            should_create_incident=True,
+                            reason="addon_threat_signal_matched",
+                            incident_type=rule.incident_type,
+                            severity=rule.severity,
+                            priority=rule.priority,
+                            title=rule.title,
+                            description=description,
+                            matched_label=normalized_signal,
+                            confidence=confidence,
+                            deduplication_window=self._deduplication_window,
+                            reusable_statuses=self._reusable_statuses,
+                        )
+
+        # 2. Fallback to primary detections (e.g., person, car)
         if not event.detections:
             return self._no_incident(
                 reason="no_detections",
