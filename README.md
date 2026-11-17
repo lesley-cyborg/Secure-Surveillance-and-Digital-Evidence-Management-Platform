@@ -1,4 +1,4 @@
-# Secure Surveillance & Digital Evidence Management Platform
+# AI-Powered Surveillance & Digital Evidence Management Platform
 
 > A security-first engineering project for turning live surveillance detections into traceable, protected, and auditable digital evidence.
 
